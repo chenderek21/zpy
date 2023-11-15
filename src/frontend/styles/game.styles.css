@@ -1,0 +1,29 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    min-height: 100vh;
+    margin: 0;
+    padding-bottom: 4vh;
+}
+
+.card-container {
+    overflow: visible;
+    margin: 1vw;
+    display: grid;
+    grid-gap: 0.5rem;
+}
+
+.card {
+    box-shadow: -0.05vw 0.05vw 0.3vw rgba(0, 0, 0, 0.5); /* Adjust these values as needed */
+    border-radius: 0.5vw;
+    display: inline-block;
+    margin-right: -75%; /* Adjust this to control the overlap */
+    display: grid;
+    /* grid-template-columns: 6vw 12vw 6vw;
+    grid-template-rows: 7vh 14vh 7vh; */
+    align-items: center;
+    justify-items: center;
+    position: relative;
+}
+
