@@ -36,6 +36,11 @@ export class Game {
 
 export function setTrumpCard(trumpCard: Card | null) {
     globalSortOrder = getSortOrder(trumpCard); // Assuming getSortOrder is accessible here
+    // Log the global sort order of cards
+    // console.log("Global Sort Order:");
+    // globalSortOrder.forEach((value, key) => {
+    //     console.log(`${key}: ${value}`);
+    // });
 }
 
 function getSortOrder(trumpCard: Card | null) {

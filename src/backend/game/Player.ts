@@ -1,4 +1,4 @@
-import { Card } from './Card';  // Assuming you have a Card class defined
+import { Card } from './Card';  
 import { Hand } from './Hand';
 
 export class Player {
@@ -9,7 +9,7 @@ export class Player {
     isPlaying: boolean;
     isDeclarer: boolean;
 
-    constructor(team: string) {
+    constructor() {
         this.score = 2; //All players start at rank 2. 
         this.team = "Offense"; //All players are on offense, declarer is first on defense
         this.currentPoints = 0;
