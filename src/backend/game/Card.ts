@@ -15,4 +15,5 @@ export class Card {
     isTrump(trumpCard: Card): boolean {
         return this.suit === trumpCard.suit || this.rank === trumpCard.rank || this.rank === 'Joker';
     }
+
 }
