@@ -7,6 +7,7 @@ import { Deck } from './game/Deck';
 import { setTrumpCard } from './game/Game';
 import { Hand } from './game/Hand';
 import { Player } from './game/Player';
+import { Play } from './game/Play';
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
