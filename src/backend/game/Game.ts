@@ -3,7 +3,7 @@ import { Player } from "./Player";
 import { Deck } from "./Deck";
 export let globalSortOrder: Map<string, number> = new Map();
 export let globalCardStrengthMap: Map<string, number> = new Map();
-
+export let trumpCardGlobal: Card;
 export class Game {
     players: Player[];
     deck: Deck;
@@ -39,13 +39,14 @@ export function setTrumpCard(trumpCard: Card | null) {
     globalSortOrder = getSortOrder(trumpCard); 
     if (trumpCard != null) {
         globalCardStrengthMap = getCardStrengthMap(trumpCard); 
+        trumpCardGlobal = trumpCard;
     }
-
+    
     // Log the global sort order of cards
-    console.log("Global Card Strength:");
-    globalCardStrengthMap.forEach((value, key) => {
-        console.log(`${key}: ${value}`);
-    });
+    // console.log("Global Card Strength:");
+    // globalCardStrengthMap.forEach((value, key) => {
+    //     console.log(`${key}: ${value}`);
+    // });
 }
 
 function getSortOrder(trumpCard: Card | null) {
@@ -132,5 +133,5 @@ function getCardStrengthMap(trumpCard: Card) {
 }
 
 function parsePlay(cardsPlayed: Card[]) {
-    
+
 }

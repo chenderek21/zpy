@@ -4,7 +4,7 @@ import { Server } from 'socket.io';
 import path from 'path';
 import { Card } from './game/Card';
 import { Deck } from './game/Deck';
-import { setTrumpCard } from './game/Game';
+import { globalCardStrengthMap, setTrumpCard } from './game/Game';
 import { Hand } from './game/Hand';
 import { Player } from './game/Player';
 import { Play } from './game/Play';
@@ -64,6 +64,16 @@ app.get('/simulateGame', async (req, res) => {
   // Return some result or status
   res.send("Game simulation completed");
 });
+
+app.get('/testValidatePlay', (req, res) => {
+  setTrumpCard(new Card("hearts","3"));
+  let cards = [new Card('red', 'Joker'), new Card('red', 'Joker')];
+  let play = new Play(cards);
+  console.log(play.parsePlay());
+  
+  res.send("Game simulation completed");
+})
+
 function delay(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
