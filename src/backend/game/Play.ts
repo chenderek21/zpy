@@ -8,7 +8,7 @@ export class Play {
         //a basic play is either some multiple of a single card 
         //i.e. single, double, triple
         //or a tractor (two or more consecutive ranks of duplicity two or greater)
-        //i.e. JJQQ, JJQQKK,JJJQQQ, JJJQQQKKK
+        //i.e. JJQQ, JJQQKK, JJJQQQ, JJJQQQKKK
         //some special logic exists for cards surrounding the declared trump card
         //e.g. if 3 of hearts is trump, 2H2H4H4H is a tractor
         //the global card strength map accounts for this logic
@@ -37,6 +37,12 @@ export class Play {
                 return 'Invalid play: cards selected with varying duplicity, to play this combination please select "throw".';
             }
         }
+        let cardDuplicityMap: Map<number, string> = new Map();
+        cardDuplicityMap.set(1, 'Single');
+        cardDuplicityMap.set(2, 'Pair');
+        cardDuplicityMap.set(3, 'Triple');
+        cardDuplicityMap.set(4, 'Quadruple');
+        cardDuplicityMap.set(5, 'Quintuple');
         if (numKeys > 1) {
             //if there's multiple single cards played then we disqualify the play as well
             if (firstFrequency === 1) {
@@ -44,16 +50,11 @@ export class Play {
                 return 'Invalid play: different cards of duplicity 1, to play this combination please select "throw".';
             }
             //if there's multiple cards of duplicity one or greater then we have to confirm it's a valid tractor
-            return this.isTractor(globalCardStrengthMap, playedCardsFreqMap);
+            return this.parseTractor(globalCardStrengthMap, playedCardsFreqMap, cardDuplicityMap);
         }
         //at this point all plays will consist a unique card (but of duplicity 1 or greater)
         console.log('valid non-tractor play');
-        let cardDuplicityMap: Map<number, string> = new Map();
-        cardDuplicityMap.set(1, 'Single');
-        cardDuplicityMap.set(2, 'Pair');
-        cardDuplicityMap.set(3, 'Triple');
-        cardDuplicityMap.set(4, 'Quadruple');
-        cardDuplicityMap.set(5, 'Quintuple');
+        
         if (this.cards[0].isTrump(trumpCardGlobal)) {
             return 'Trump '+cardDuplicityMap.get(firstFrequency);
         }
@@ -65,7 +66,7 @@ export class Play {
 
     }
 
-    isTractor(cardStrengthMap: Map<string, number>, playedCardsFreqMap: Map<string, number>): string {
+    parseTractor(cardStrengthMap: Map<string, number>, playedCardsFreqMap: Map<string, number>, cardDuplicityMap: Map<number, string>): string {
         let strengths: number[] = [];
         //Convert card frequency map keys to their strengths
         for (let card of playedCardsFreqMap.keys()) {
@@ -82,11 +83,33 @@ export class Play {
             if (strengths[i + 1] - strengths[i] !== 1) {
                 console.log('card rank strengths are not consecutive, invalid tractor');
                 return 'Invalid play: card rank strengths are not consecutive (invalid tractor)'; 
+
             }
         }
-        console.log('valid tractor');
-        return 'Valid tractor'; 
+        //Parse if it's a valid tractor
+        let firstFrequency = 0;
+        let tractorDuplicity;
+        for (let frequency of playedCardsFreqMap.values()) {
+            firstFrequency = frequency;
+        }
+        tractorDuplicity = cardDuplicityMap.get(firstFrequency);
+            
+        if (this.cards[0].isTrump(trumpCardGlobal)) {
+            if (tractorDuplicity === "Pair") {
+                return 'Trump Tractor';
+            }
+            return 'Trump '+tractorDuplicity+' Tractor';
+        }
+        else {
+            let unformattedSuit = this.cards[0].suit;
+            let formattedSuit = unformattedSuit.charAt(0).toUpperCase() + unformattedSuit.slice(1,-1);
+            if (tractorDuplicity === "Pair") {
+                return formattedSuit+' Tractor';
+            }
+            return formattedSuit+' '+tractorDuplicity+' Tractor';
+        }
     }
+
 
 
 }

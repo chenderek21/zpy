@@ -67,7 +67,7 @@ app.get('/simulateGame', async (req, res) => {
 
 app.get('/testValidatePlay', (req, res) => {
   setTrumpCard(new Card("hearts","3"));
-  let cards = [new Card('red', 'Joker'), new Card('red', 'Joker')];
+  let cards = [new Card('spades', '2'), new Card('spades', '2'), new Card('spades', '2'),new Card('spades', '4'), new Card('spades', '4'), new Card('spades', '4')];
   let play = new Play(cards);
   console.log(play.parsePlay());
   
