@@ -3,7 +3,9 @@ import { globalCardStrengthMap } from "./Game";
 import { trumpCardGlobal } from "./Game";
 export class Play {
     private cards: Card[] = [];
-    
+    private duplicity: number = 0;
+    private strength: number = 0;
+    private suit: string = "";
     constructor(cards: Card[]) {
         //a basic play is either some multiple of a single card 
         //i.e. single, double, triple
@@ -13,6 +15,10 @@ export class Play {
         //e.g. if 3 of hearts is trump, 2H2H4H4H is a tractor
         //the global card strength map accounts for this logic
         this.cards = cards;
+    }
+
+    getCards(): Card[] {
+        return this.cards;
     }
 
     parsePlay(): string {
@@ -54,12 +60,20 @@ export class Play {
         }
         //at this point all plays will consist a unique card (but of duplicity 1 or greater)
         console.log('valid non-tractor play');
-        
+        this.duplicity = firstFrequency;
+        let strength = globalCardStrengthMap.get(this.cards[0].suit + "_" + this.cards[0].rank);
+        if (strength !== undefined) {
+            this.strength = strength;
+        } else {
+            this.strength = 0; 
+        }
         if (this.cards[0].isTrump(trumpCardGlobal)) {
+            this.suit = "trump";
             return 'Trump '+cardDuplicityMap.get(firstFrequency);
         }
         else {
             let unformattedSuit = this.cards[0].suit;
+            this.suit = unformattedSuit;
             let formattedSuit = unformattedSuit.charAt(0).toUpperCase() + unformattedSuit.slice(1,-1);
             return formattedSuit+' '+cardDuplicityMap.get(firstFrequency);
         }
@@ -87,14 +101,17 @@ export class Play {
             }
         }
         //Parse if it's a valid tractor
+
         let firstFrequency = 0;
         let tractorDuplicity;
         for (let frequency of playedCardsFreqMap.values()) {
             firstFrequency = frequency;
         }
-        tractorDuplicity = cardDuplicityMap.get(firstFrequency);
-            
+        tractorDuplicity = cardDuplicityMap.get(firstFrequency); 
+        this.strength = strengths[0];
+        this.duplicity = firstFrequency; 
         if (this.cards[0].isTrump(trumpCardGlobal)) {
+            this.suit = "trump";
             if (tractorDuplicity === "Pair") {
                 return 'Trump Tractor';
             }
@@ -102,6 +119,7 @@ export class Play {
         }
         else {
             let unformattedSuit = this.cards[0].suit;
+            this.suit = unformattedSuit;
             let formattedSuit = unformattedSuit.charAt(0).toUpperCase() + unformattedSuit.slice(1,-1);
             if (tractorDuplicity === "Pair") {
                 return formattedSuit+' Tractor';

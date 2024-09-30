@@ -1,0 +1,111 @@
+body {
+    font-family: 'Montserrat';
+    margin: 0;
+    padding: 0;
+    background-color: #f0f2f5;
+    color: #333;
+}
+button, input, textarea {
+    font-family: 'Montserrat', sans-serif;
+}
+
+header, nav, main, aside, footer {
+    padding: 20px;
+    font-size: 20px;
+}
+
+header {
+    background-color: green;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+}
+
+nav {
+    background-color: green;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+}
+
+nav ul {
+    list-style-type: none; 
+    margin: 0;
+    padding: 0;
+
+}
+
+nav ul li {
+    display: inline; 
+    margin-right: 2vmax; 
+    margin-left: 2vmax; 
+
+}
+
+nav ul li a {
+    text-decoration: none; 
+    color: white; 
+}
+
+nav ul li a:hover {
+    color: lightgray; 
+    transition: color 0.3s;
+}
+
+main {
+    padding: 20px;
+    text-align: center;
+}
+
+#welcomeMessage {
+    font-weight: bold; 
+    font-size: 32px; 
+    text-align: center; 
+    margin-bottom: 20px; 
+}
+
+#cards img {
+    max-width: 100px; 
+    margin: 10px;
+    border-radius: 0.5vw;
+    box-shadow: 0.1vw 0.1vw 0.5vw rgba(0, 0, 0, 0.5); 
+}
+
+button {
+    background-color: green;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: darkgreen;
+}
+
+input[type="text"] {
+    padding: 10px;
+    margin: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+
+#errorMessage {
+    color: red;
+    margin: 10px;
+}
+
+footer {
+    background-color: green;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+}

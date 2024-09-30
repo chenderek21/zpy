@@ -1,1 +1,71 @@
-hello
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>找朋友！(Finding Friends)</title>
+    <link rel="icon" type="image/png" href="/assets/images/tractor.png">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles/home.styles.css"> <!-- Link to your stylesheet -->
+    <!-- You can add additional meta tags, styles, or scripts here -->
+</head>
+<body>
+
+
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/rules">Rules</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <!-- The main content of your webpage -->
+        <h1 id="welcomeMessage">Welcome to 找朋友/Finding Friends!</h1>
+
+        <p id="cards">
+            <img src="/assets/cards/5_of_diamonds.png" alt="5 of Diamonds">
+            <img src="/assets/cards/10_of_spades.png" alt="10 of Spades">
+            <img src="/assets/cards/K_of_hearts.png" alt="King of Hearts">
+        </p>
+
+        <p id="description">
+            找朋友 (Finding Friends) is a Chinese trick-taking card game in the family of 升级 (rank up) card games. 
+        </p>
+
+        <p id="description">
+            Gather a group of 5 or more and let the fun begin! 
+        </p>
+        <section>
+            <!-- A section of content -->
+            Create a game room:
+            <button id="createRoomBtn">Create Room</button>
+        </section>
+        <section>
+            <!-- A section of content -->
+            Join a game room:
+            <input type="text" id="roomCodeInput" placeholder="Enter Room Code">
+            <button id="joinRoomBtn">Join Room</button> <div id="errorMessage" style="color: red; display: none;"></div>
+        </section>
+        <article>
+            <!-- An article or standalone content -->
+        </article>
+        <!-- Add more sections or articles as needed -->
+    </main>
+
+    <aside>
+        <!-- Sidebar content or additional information -->
+    </aside>
+
+    <footer>
+        <!-- Your footer content (e.g., copyright, links) -->
+        Created by Derek Chen
+    </footer>
+
+    <script src="/home.bundle.js"></script>
+
+</body>
+</html>

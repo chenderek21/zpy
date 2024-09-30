@@ -4,32 +4,17 @@
     <link rel="stylesheet" type="text/css" href="/styles/game.styles.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../assets/images/tractor.png">
+
     <title>Game</title>
 </head>
 <body>
+
+    <div id="playerContainer"></div>
+
     <div id="cardsContainer"></div>
 
-    <script>
-        // Fetch the first ten cards from the backend
-        fetch('/getFirstTenCards')
-            .then(response => response.json())
-            .then(hand => { // 'hand' now represents the Hand object
-                const cards = hand.cards; // Access the cards array
-                const container = document.getElementById('cardsContainer');
-                container.className = 'card-container';
-                cards.forEach(card => {
-                    const img = document.createElement('img');
-                    img.src = '/assets/cards/' + card.img_url;
-                    console.log(img.src);
-                    img.alt = `${card.rank} of ${card.suit}`;
-                    img.width = 100; // optional, set width for the card
-                    img.className = 'card'; 
-                    container.appendChild(img);
-                });
-                const cardWidth = container.querySelector('.card').width;
-                const gridColumnWidth = cardWidth * 0.25;
-                container.style.gridTemplateColumns = `repeat(${cards.length}, ${gridColumnWidth}px)`;
-            });
-    </script>
+    <script src="/game.bundle.js"></script>
+
 </body>
 </html>

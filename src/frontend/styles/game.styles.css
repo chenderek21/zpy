@@ -7,6 +7,11 @@ body {
     padding-bottom: 4vh;
 }
 
+#playerContainer {
+    text-align: center;
+    margin-top: 20px;
+}
+
 .card-container {
     overflow: visible;
     margin: 1vw;
@@ -15,7 +20,7 @@ body {
 }
 
 .card {
-    box-shadow: -0.05vw 0.05vw 0.3vw rgba(0, 0, 0, 0.5); /* Adjust these values as needed */
+    box-shadow: -0.05vw 0.05vw 0.3vw rgba(0, 0, 0, 0.5); 
     border-radius: 0.5vw;
     display: inline-block;
     margin-right: -75%; /* Adjust this to control the overlap */
@@ -25,5 +30,19 @@ body {
     align-items: center;
     justify-items: center;
     position: relative;
+
+    transition: transform 0.1s ease;
+
 }
 
+.card:hover {
+    transform: translateY(-20%); 
+}
+
+.card.selected {
+    transform: translateY(-20%); 
+}
+
+.card.no-hover {
+    transform: translateY(0%) !important; 
+}
