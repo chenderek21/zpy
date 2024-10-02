@@ -20,12 +20,12 @@
             <li><a href="/contact">Contact</a></li>
         </ul>
     </nav>
-    
+    <br/>
     <h1 id="welcomeToRoom">Room </h1>
     <p>Send this code to your friends so they can join the game!</p>
 
     <div id='enterName'><h2>Enter your name to join the lobby:</h2></div>
-    <div id='waitingForPlayers'><h2>Waiting for other players to join...</h2></div>
+    <div id='waitingForPlayers'><br/><h2>Waiting for more players to join...</h2></div>
     <form id="joinForm">
         <input type="text" id="playerName" placeholder="Enter your name" required>
         <button type="submit">Join Room Lobby</button>
@@ -34,24 +34,6 @@
     <div id="playerContainer"></div>
 
     <script src="/home.bundle.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
 
-            const urlParts = window.location.pathname.split('/');
-            const roomCode = urlParts[urlParts.length - 1]; 
-            const welcomeToRoom = document.getElementById('welcomeToRoom');
-            welcomeToRoom.textContent = `Welcome to Room ${roomCode}!`;
-            const waitingForPlayers = document.getElementById('waitingForPlayers');
-            const joinForm = document.getElementById('joinForm');
-
-            joinForm.addEventListener('submit', function(event) {
-                event.preventDefault();
-
-                joinForm.style.display = 'none';
-                enterName.style.display = 'none';
-                waitingForPlayers.style.display = 'block';
-            });
-        });
-    </script>
 </body>
 </html>

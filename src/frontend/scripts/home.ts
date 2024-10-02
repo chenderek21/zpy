@@ -7,6 +7,12 @@ interface Player {
     name: string; 
   }
 
+interface LobbyState {
+    players: { id: string, name: string, ready: boolean }[];
+    gameStarted: boolean;
+}
+
+
 //from the home page, create a new room -> redirects to the lobby page
 document.getElementById('createRoomBtn')?.addEventListener('click', () => {
     console.log("create room button clicked");
@@ -49,11 +55,41 @@ if (joinForm) {
     });
 } 
 
+
+document.addEventListener("DOMContentLoaded", () => {
+    const urlParts = window.location.pathname.split('/');
+    const roomCode = urlParts[urlParts.length - 1];
+
+    const welcomeToRoom = document.getElementById('welcomeToRoom') as HTMLElement;
+    if (welcomeToRoom) {
+        welcomeToRoom.textContent = `Welcome to Room ${roomCode}!`;
+    }
+
+    const waitingForPlayers = document.getElementById('waitingForPlayers') as HTMLElement;
+    const joinForm = document.getElementById('joinForm') as HTMLFormElement;
+
+    if (joinForm) {
+        joinForm.addEventListener('submit', (event: Event) => {
+            event.preventDefault();
+            //hide stuff after name entered
+            const enterName = document.getElementById('enterName') as HTMLElement;
+            if (enterName) {
+                enterName.style.display = 'none';
+            }
+            //show diff message
+            if (waitingForPlayers) {
+                waitingForPlayers.style.display = 'block';
+            }
+            joinForm.style.display = 'none';
+        });
+    }
+
+    //logic to show current players
+});
+
 // Handle socket events
 socket.on('joinSuccess', ({ code, playerName }) => {
     alert(`Welcome ${playerName}! You have joined room ${code}.`);
-    // Optionally, redirect to the game room or update the UI
-    // window.location.href = `${window.location.origin}/game/${code}`;
 });
 
 socket.on('joinError', (message) => {

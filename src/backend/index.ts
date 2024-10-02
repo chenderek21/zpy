@@ -84,7 +84,7 @@ app.get('/join/:roomCode', (req, res) => {
   if (room) {
     // Define the absolute path to your game.html
     console.log("displaying join room to "+roomCode);
-
+    
     const gamePath = path.join(__dirname, '../frontend/views/joinRoom.html');
     // Send the game.html file to the client
     
@@ -135,6 +135,18 @@ function delay(ms: number) {
 io.on('connection', (socket) => {
   console.log('a user connected');
   console.log(socket.id);
+  //Retrieve the player list whenever a user joins a game lobby page (not working)
+  socket.on('getPlayers', ({ roomCode }) => {
+    const room = getRoom(roomCode);
+    if (room) {
+      const players = room.getPlayers().map(player => ({ id: player.getId(), name: player.getName() }));
+      socket.emit('updatePlayers', players);
+      console.log(`Sent player list to client for room ${roomCode}`, players);
+    } else {
+      socket.emit('joinError', 'Room not found');
+    }
+  });
+  //Update the player list when a player joins the game lobby
   socket.on('joinRoom', ({ roomCode, playerName }) => {
     const room = getRoom(roomCode);
     if (room) {
@@ -145,12 +157,12 @@ io.on('connection', (socket) => {
       room.addPlayer(player);
 
       socket.emit('joinSuccess', { code: roomCode, playerName: playerName });
-      console.log("emitting updatePlayers event from server to room "+roomCode);
       console.log(room.getPlayers());
       // Emit the updated player list to everyone in the room
       const players = room.getPlayers().map(player => ({ id: player.getId(), name: player.getName() }));
       console.log(players)
       socket.emit('updatePlayers', players);
+      io.to(roomCode).emit('updatePlayers', players);
       console.log(`Emitted updatePlayers to room ${roomCode}`, players);
 
     } else {

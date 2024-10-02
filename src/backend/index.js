@@ -130,6 +130,19 @@ function delay(ms) {
 io.on('connection', (socket) => {
     console.log('a user connected');
     console.log(socket.id);
+    //Retrieve the player list whenever a user joins a game lobby page
+    socket.on('getPlayers', ({ roomCode }) => {
+        const room = getRoom(roomCode);
+        if (room) {
+            const players = room.getPlayers().map(player => ({ id: player.getId(), name: player.getName() }));
+            socket.emit('updatePlayers', players);
+            console.log(`Sent player list to client for room ${roomCode}`, players);
+        }
+        else {
+            socket.emit('joinError', 'Room not found');
+        }
+    });
+    //Update the player list when a player joins the game lobby
     socket.on('joinRoom', ({ roomCode, playerName }) => {
         const room = getRoom(roomCode);
         if (room) {
@@ -144,6 +157,7 @@ io.on('connection', (socket) => {
             const players = room.getPlayers().map(player => ({ id: player.getId(), name: player.getName() }));
             console.log(players);
             socket.emit('updatePlayers', players);
+            io.to(roomCode).emit('updatePlayers', players);
             console.log(`Emitted updatePlayers to room ${roomCode}`, players);
         }
         else {
@@ -171,4 +185,5 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
+//test commit
 //# sourceMappingURL=index.js.map

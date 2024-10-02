@@ -44,6 +44,29 @@ if (joinForm) {
         }
     });
 }
+document.addEventListener("DOMContentLoaded", () => {
+    const urlParts = window.location.pathname.split('/');
+    const roomCode = urlParts[urlParts.length - 1];
+    const welcomeToRoom = document.getElementById('welcomeToRoom');
+    if (welcomeToRoom) {
+        welcomeToRoom.textContent = `Welcome to Room ${roomCode}!`;
+    }
+    const waitingForPlayers = document.getElementById('waitingForPlayers');
+    const joinForm = document.getElementById('joinForm');
+    if (joinForm) {
+        joinForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            // const enterName = document.getElementById('enterName') as HTMLElement;
+            // if (enterName) {
+            //     enterName.style.display = 'none';
+            // }
+            if (waitingForPlayers) {
+                waitingForPlayers.style.display = 'block';
+            }
+            joinForm.style.display = 'none';
+        });
+    }
+});
 // Handle socket events
 socket.on('joinSuccess', ({ code, playerName }) => {
     alert(`Welcome ${playerName}! You have joined room ${code}.`);
