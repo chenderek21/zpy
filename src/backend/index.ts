@@ -9,10 +9,13 @@ import { Hand } from './game/Hand';
 import { Player } from './game/Player';
 import { Play } from './game/Play';
 import { Room } from './game/Room';
+import { Lobby } from '../shared/Lobby';
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 var rooms: { [code: string]: Room } = {};
+const lobbies: { [roomCode: string]: Lobby } = {};
 
 app.use(express.static('src/frontend')); 
 app.use(express.static('dist')); 
@@ -135,57 +138,52 @@ function delay(ms: number) {
 io.on('connection', (socket) => {
   console.log('a user connected');
   console.log(socket.id);
-  //Retrieve the player list whenever a user joins a game lobby page (not working)
-  socket.on('getPlayers', ({ roomCode }) => {
-    const room = getRoom(roomCode);
-    if (room) {
-      const players = room.getPlayers().map(player => ({ id: player.getId(), name: player.getName() }));
-      socket.emit('updatePlayers', players);
-      console.log(`Sent player list to client for room ${roomCode}`, players);
-    } else {
-      socket.emit('joinError', 'Room not found');
+  socket.on('joinRoom', ({ roomCode }) => {
+    updateLobbyState(roomCode)
+  })
+
+  socket.on('joinLobby', ({ roomCode, playerName }) => {
+    if (!lobbies[roomCode]) {
+        lobbies[roomCode] = new Lobby(roomCode);
+    }
+    const lobby = lobbies[roomCode];
+    socket.emit('joinSuccess', ({code: roomCode, playerName: playerName}))
+    const lobbyPlayer = { id: socket.id, name: playerName, ready: false };
+    lobby.addPlayer(lobbyPlayer);
+
+    updateLobbyState(roomCode);
+  });
+
+  socket.on('readyUp', ({ roomCode }) => {
+    const lobby = lobbies[roomCode];
+    if (lobby) {
+      lobby.toggleReady(socket.id);
+      //lobby.startGameIfReady();
+      updateLobbyState(roomCode);
     }
   });
-  //Update the player list when a player joins the game lobby
-  socket.on('joinRoom', ({ roomCode, playerName }) => {
-    const room = getRoom(roomCode);
-    if (room) {
-      socket.join(roomCode);
 
-      const player = new Player(socket.id);
-      player.setName(playerName);
-      room.addPlayer(player);
-
-      socket.emit('joinSuccess', { code: roomCode, playerName: playerName });
-      console.log(room.getPlayers());
-      // Emit the updated player list to everyone in the room
-      const players = room.getPlayers().map(player => ({ id: player.getId(), name: player.getName() }));
-      console.log(players)
-      socket.emit('updatePlayers', players);
-      io.to(roomCode).emit('updatePlayers', players);
-      console.log(`Emitted updatePlayers to room ${roomCode}`, players);
-
-    } else {
-      socket.emit('joinError', 'Room not found');
+  socket.on('disconnect', () => {
+    for (const roomCode in lobbies) {
+      const lobby = lobbies[roomCode];
+      lobby.removePlayer(socket.id);
+      updateLobbyState(roomCode);
     }
-
   });
-  // Handle the 'cardClicked' event
+
+
+  function updateLobbyState(roomCode: string) {
+    socket.join(roomCode)
+    const lobby = lobbies[roomCode];
+    if (lobby) {
+      console.log("emitting ")
+      io.to(roomCode).emit('update', { lobbyState: lobby.getLobbyState() });
+    }
+  }
+    // Handle the 'cardClicked' event
   socket.on('cardClicked', (card) => {
       console.log(`Card clicked: ${card.rank} of ${card.suit}`);
   });
-  socket.on('disconnect', () => {
-    console.log('user disconnected');
-  //   for (let code in rooms) {
-  //     const room = rooms[code];
-  //     if (room) {
-  //         room.removePlayer(socket.id); // Change to use player's name or ID
-  //         io.to(code).emit('updatePlayers', room.getPlayers().map(player => ({ id: socket.id, name: player.getName() })));
-  //         console.log(`Updated players in room ${code}`, room.getPlayers());
-  //     }
-  // }
-  });
-  // ... more socket event handlers ...
 });
 
 const PORT = process.env.PORT || 3000;

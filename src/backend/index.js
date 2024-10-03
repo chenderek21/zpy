@@ -22,10 +22,12 @@ const Game_1 = require("./game/Game");
 const Player_1 = require("./game/Player");
 const Play_1 = require("./game/Play");
 const Room_1 = require("./game/Room");
+const Lobby_1 = require("../shared/Lobby");
 const app = (0, express_1.default)();
 const server = http_1.default.createServer(app);
 const io = new socket_io_1.Server(server);
 var rooms = {};
+const lobbies = {};
 app.use(express_1.default.static('src/frontend'));
 app.use(express_1.default.static('dist'));
 app.use(express_1.default.json());
@@ -130,56 +132,52 @@ function delay(ms) {
 io.on('connection', (socket) => {
     console.log('a user connected');
     console.log(socket.id);
-    //Retrieve the player list whenever a user joins a game lobby page
-    socket.on('getPlayers', ({ roomCode }) => {
-        const room = getRoom(roomCode);
-        if (room) {
-            const players = room.getPlayers().map(player => ({ id: player.getId(), name: player.getName() }));
-            socket.emit('updatePlayers', players);
-            console.log(`Sent player list to client for room ${roomCode}`, players);
-        }
-        else {
-            socket.emit('joinError', 'Room not found');
-        }
+    socket.on('showContent', ({ roomCode }) => {
+        updateLobbyState(roomCode);
     });
-    //Update the player list when a player joins the game lobby
     socket.on('joinRoom', ({ roomCode, playerName }) => {
-        const room = getRoom(roomCode);
-        if (room) {
-            socket.join(roomCode);
-            const player = new Player_1.Player(socket.id);
-            player.setName(playerName);
-            room.addPlayer(player);
-            socket.emit('joinSuccess', { code: roomCode, playerName: playerName });
-            console.log("emitting updatePlayers event from server to room " + roomCode);
-            console.log(room.getPlayers());
-            // Emit the updated player list to everyone in the room
-            const players = room.getPlayers().map(player => ({ id: player.getId(), name: player.getName() }));
-            console.log(players);
-            socket.emit('updatePlayers', players);
-            io.to(roomCode).emit('updatePlayers', players);
-            console.log(`Emitted updatePlayers to room ${roomCode}`, players);
+        // Get or create the lobby for the roomCode
+        if (!lobbies[roomCode]) {
+            lobbies[roomCode] = new Lobby_1.Lobby(roomCode);
         }
-        else {
-            socket.emit('joinError', 'Room not found');
+        const lobby = lobbies[roomCode];
+        socket.emit('joinSuccess', ({ code: roomCode, playerName: playerName }));
+        const lobbyPlayer = { id: socket.id, name: playerName, ready: false };
+        lobby.addPlayer(lobbyPlayer);
+        // Emit the updated lobby state to all clients in the room
+        updateLobbyState(roomCode);
+    });
+    socket.on('readyUp', ({ roomCode }) => {
+        const lobby = lobbies[roomCode];
+        if (lobby) {
+            lobby.toggleReady(socket.id);
+            // Check if all players are ready and start the game if necessary
+            lobby.startGameIfReady();
+            // Emit the updated lobby state to all clients in the room
+            updateLobbyState(roomCode);
         }
     });
+    socket.on('disconnect', () => {
+        // Remove the player from the lobby on disconnect
+        for (const roomCode in lobbies) {
+            const lobby = lobbies[roomCode];
+            lobby.removePlayer(socket.id);
+            // Emit the updated lobby state to all clients in the room
+            updateLobbyState(roomCode);
+        }
+    });
+    function updateLobbyState(roomCode) {
+        socket.join(roomCode);
+        const lobby = lobbies[roomCode];
+        if (lobby) {
+            console.log("emitting ");
+            io.to(roomCode).emit('update', { lobbyState: lobby.getLobbyState() });
+        }
+    }
     // Handle the 'cardClicked' event
     socket.on('cardClicked', (card) => {
         console.log(`Card clicked: ${card.rank} of ${card.suit}`);
     });
-    socket.on('disconnect', () => {
-        console.log('user disconnected');
-        //   for (let code in rooms) {
-        //     const room = rooms[code];
-        //     if (room) {
-        //         room.removePlayer(socket.id); // Change to use player's name or ID
-        //         io.to(code).emit('updatePlayers', room.getPlayers().map(player => ({ id: socket.id, name: player.getName() })));
-        //         console.log(`Updated players in room ${code}`, room.getPlayers());
-        //     }
-        // }
-    });
-    // ... more socket event handlers ...
 });
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {

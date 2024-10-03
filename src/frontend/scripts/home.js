@@ -26,60 +26,60 @@ const socket = (0, socket_io_client_1.io)('http://localhost:3000');
         console.error('Error creating room:', error);
     });
 });
-//on the join room/lobby screen, allow the user to join the room (only adds to lobby list until game starts)
-const joinForm = document.getElementById('joinForm');
-if (joinForm) {
-    joinForm.addEventListener('submit', function (event) {
-        event.preventDefault();
-        const playerNameInput = document.getElementById('playerName');
-        if (playerNameInput) {
-            const playerName = playerNameInput.value;
-            // Extract the room code from the URL
-            const pathSegments = window.location.pathname.split('/');
-            const roomCode = pathSegments[2];
-            socket.emit('joinRoom', { roomCode, playerName });
-        }
-        else {
-            console.error('Player name input field is missing!');
-        }
-    });
-}
 document.addEventListener("DOMContentLoaded", () => {
-    const urlParts = window.location.pathname.split('/');
-    const roomCode = urlParts[urlParts.length - 1];
+    // Listen for lobby state updates from the server
+    socket.on('update', (data) => {
+        updateLobbyState(data.lobbyState);
+    });
+    const roomCode = getRoomCodeFromURL();
+    socket.emit('showContent', { roomCode });
     const welcomeToRoom = document.getElementById('welcomeToRoom');
     if (welcomeToRoom) {
         welcomeToRoom.textContent = `Welcome to Room ${roomCode}!`;
     }
+    const enterName = document.getElementById('enterName');
+    const playerNameInput = document.getElementById('playerName');
     const waitingForPlayers = document.getElementById('waitingForPlayers');
+    const joinButton = document.getElementById('joinButton');
     const joinForm = document.getElementById('joinForm');
-    if (joinForm) {
-        joinForm.addEventListener('submit', (event) => {
-            event.preventDefault();
-            // const enterName = document.getElementById('enterName') as HTMLElement;
-            // if (enterName) {
-            //     enterName.style.display = 'none';
-            // }
-            if (waitingForPlayers) {
-                waitingForPlayers.style.display = 'block';
+    if (joinButton) {
+        joinButton.addEventListener('click', () => {
+            const playerName = playerNameInput.value;
+            if (playerName) {
+                socket.emit('joinRoom', { roomCode, playerName });
+                if (enterName) {
+                    enterName.style.display = 'none';
+                }
+                if (waitingForPlayers) {
+                    waitingForPlayers.style.display = 'block';
+                }
+                joinForm.style.display = 'none';
             }
-            joinForm.style.display = 'none';
         });
+    }
+    // Update the UI based on the lobby state
+    function updateLobbyState(lobbyState) {
+        const playerContainer = document.getElementById('playerContainer');
+        playerContainer.innerHTML = ''; // Clear current list
+        lobbyState.players.forEach((player) => {
+            const playerDiv = document.createElement('div');
+            playerDiv.textContent = `${player.name} ${player.ready ? '(Ready)' : ''}`;
+            playerContainer.appendChild(playerDiv);
+        });
+        const gameStatus = document.getElementById('gameStatus');
+        gameStatus.textContent = lobbyState.gameStarted ? 'Game has started!' : 'Waiting for players to ready up...';
+    }
+    function getRoomCodeFromURL() {
+        const urlParts = window.location.pathname.split('/');
+        return urlParts[urlParts.length - 1];
     }
 });
 // Handle socket events
 socket.on('joinSuccess', ({ code, playerName }) => {
     alert(`Welcome ${playerName}! You have joined room ${code}.`);
-    // Optionally, redirect to the game room or update the UI
-    // window.location.href = `${window.location.origin}/game/${code}`;
 });
 socket.on('joinError', (message) => {
     alert(message);
-});
-// Listen for updates from the server about the players
-socket.on('updatePlayers', (players) => {
-    console.log("Updating players:", players);
-    updatePlayerList(players);
 });
 (_b = document.getElementById('joinRoomBtn')) === null || _b === void 0 ? void 0 : _b.addEventListener('click', () => {
     const roomInput = document.getElementById('roomCodeInput');
@@ -118,16 +118,6 @@ function displayErrorMessage(message) {
         errorMessageDiv.textContent = message;
         errorMessageDiv.style.display = 'block';
     }
-}
-function updatePlayerList(players) {
-    console.log("Updating player list");
-    const playerContainer = document.getElementById('playerContainer');
-    playerContainer.innerHTML = ''; // Clear existing player list
-    players.forEach(player => {
-        const playerElement = document.createElement('div');
-        playerElement.textContent = player.name;
-        playerContainer.appendChild(playerElement);
-    });
 }
 function generateRoomCode() {
     return Math.random().toString(36).slice(2, 7).toUpperCase();

@@ -37,7 +37,6 @@ export class Player {
         this.score += numRanks;
     }
 
-    // Method to calculate points, update score, etc.
     updatePoints(points: number) {
         this.currentPoints += points;
     }
@@ -47,7 +46,6 @@ export class Player {
         this.isDeclarer = true;
     }
 
-    // ... other methods as per your game's logic
     setHand(hand: Hand) {
         this.hand = hand;
     }

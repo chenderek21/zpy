@@ -24,14 +24,20 @@
     <h1 id="welcomeToRoom">Room </h1>
     <p>Send this code to your friends so they can join the game!</p>
 
-    <div id='enterName'><h2>Enter your name to join the lobby:</h2></div>
-    <div id='waitingForPlayers'><br/><h2>Waiting for more players to join...</h2></div>
-    <form id="joinForm">
+    <div id='enterName'>
+        <h2>Enter your name to join the lobby:</h2>
         <input type="text" id="playerName" placeholder="Enter your name" required>
-        <button type="submit">Join Room Lobby</button>
-    </form>
+        <button id="joinButton">Join Room Lobby</button>
+    </div>
+    <div id='waitingForPlayers'>
+        <br/><h2 id="gameStatus">Waiting for players to join...</h2>
+        <button id="readyButton">Ready Up</button>
+    </div>
+
     <h2>Players in Lobby:</h2>
     <div id="playerContainer"></div>
+    
+    <h2 id="gameStatus"></h2>
 
     <script src="/home.bundle.js"></script>
 

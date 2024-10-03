@@ -28,7 +28,6 @@ class Player {
     updateScore(numRanks) {
         this.score += numRanks;
     }
-    // Method to calculate points, update score, etc.
     updatePoints(points) {
         this.currentPoints += points;
     }
@@ -36,7 +35,6 @@ class Player {
         this.team = "Defense";
         this.isDeclarer = true;
     }
-    // ... other methods as per your game's logic
     setHand(hand) {
         this.hand = hand;
     }

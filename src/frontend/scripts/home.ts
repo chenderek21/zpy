@@ -1,16 +1,8 @@
 import { io } from 'socket.io-client';
+import { LobbyPlayer } from '../../shared/Lobby';
 
 const socket = io('http://localhost:3000');
 
-interface Player {
-    id: string; 
-    name: string; 
-  }
-
-interface LobbyState {
-    players: { id: string, name: string, ready: boolean }[];
-    gameStarted: boolean;
-}
 
 
 //from the home page, create a new room -> redirects to the lobby page
@@ -36,55 +28,61 @@ document.getElementById('createRoomBtn')?.addEventListener('click', () => {
     });
 });
 
-//on the join room/lobby screen, allow the user to join the room (only adds to lobby list until game starts)
-const joinForm = document.getElementById('joinForm');
-if (joinForm) {
-    joinForm.addEventListener('submit', function(event) {
-        event.preventDefault();
-
-        const playerNameInput = document.getElementById('playerName') as HTMLInputElement;
-        if (playerNameInput) {
-            const playerName = playerNameInput.value;
-            // Extract the room code from the URL
-            const pathSegments = window.location.pathname.split('/');
-            const roomCode = pathSegments[2];  
-            socket.emit('joinRoom', { roomCode, playerName });
-        } else {
-            console.error('Player name input field is missing!');
-        }
-    });
-} 
 
 
 document.addEventListener("DOMContentLoaded", () => {
-    const urlParts = window.location.pathname.split('/');
-    const roomCode = urlParts[urlParts.length - 1];
+    // Listen for lobby state updates from the server
+    socket.on('update', (data) => {
+        updateLobbyState(data.lobbyState);
+    });
+    const roomCode = getRoomCodeFromURL();
+    socket.emit('joinRoom', { roomCode })
 
     const welcomeToRoom = document.getElementById('welcomeToRoom') as HTMLElement;
     if (welcomeToRoom) {
         welcomeToRoom.textContent = `Welcome to Room ${roomCode}!`;
     }
-
+    const enterName = document.getElementById('enterName') as HTMLElement;
+    const playerNameInput = document.getElementById('playerName') as HTMLInputElement;
     const waitingForPlayers = document.getElementById('waitingForPlayers') as HTMLElement;
+    const joinButton = document.getElementById('joinButton') as HTMLButtonElement;
     const joinForm = document.getElementById('joinForm') as HTMLFormElement;
 
-    if (joinForm) {
-        joinForm.addEventListener('submit', (event: Event) => {
-            event.preventDefault();
-            //hide stuff after name entered
-            const enterName = document.getElementById('enterName') as HTMLElement;
-            if (enterName) {
-                enterName.style.display = 'none';
+    if (joinButton) {
+        joinButton.addEventListener('click', () => {
+            const playerName = playerNameInput.value;
+            if (playerName) {
+                socket.emit('joinLobby', { roomCode, playerName });
+
+                if (enterName) {
+                    enterName.style.display = 'none';
+                }
+                if (waitingForPlayers) {
+                    waitingForPlayers.style.display = 'block';
+                }
+                joinForm.style.display = 'none';
             }
-            //show diff message
-            if (waitingForPlayers) {
-                waitingForPlayers.style.display = 'block';
-            }
-            joinForm.style.display = 'none';
         });
     }
 
-    //logic to show current players
+    function updateLobbyState(lobbyState: { players: LobbyPlayer[], gameStarted: boolean }) {
+        const playerContainer = document.getElementById('playerContainer') as HTMLElement;
+        playerContainer.innerHTML = ''; 
+
+        lobbyState.players.forEach((player: LobbyPlayer) => {
+            const playerDiv = document.createElement('div');
+            playerDiv.textContent = `${player.name} ${player.ready ? '(Ready)' : ''}`;
+            playerContainer.appendChild(playerDiv);
+        });
+
+        const gameStatus = document.getElementById('gameStatus') as HTMLElement;
+        gameStatus.textContent = lobbyState.gameStarted ? 'Game has started!' : 'Waiting for players to ready up...';
+    }
+
+    function getRoomCodeFromURL(): string {
+        const urlParts = window.location.pathname.split('/');
+        return urlParts[urlParts.length - 1];
+    }
 });
 
 // Handle socket events
@@ -96,11 +94,6 @@ socket.on('joinError', (message) => {
     alert(message);
 });
 
-// Listen for updates from the server about the players
-socket.on('updatePlayers', (players: Player[]) => {
-    console.log("Updating players:", players);
-    updatePlayerList(players);
-  });
 
 document.getElementById('joinRoomBtn')?.addEventListener('click', () => {
     const roomInput = document.getElementById('roomCodeInput') as HTMLInputElement;
@@ -140,18 +133,6 @@ function displayErrorMessage(message: string) {
         errorMessageDiv.style.display = 'block';
     }
 }
-
-function updatePlayerList(players: Player[]) {
-    console.log("Updating player list");
-    const playerContainer = document.getElementById('playerContainer') as HTMLElement;
-    playerContainer.innerHTML = ''; // Clear existing player list
-    players.forEach(player => {
-      const playerElement = document.createElement('div');
-      playerElement.textContent = player.name;
-      playerContainer.appendChild(playerElement);
-    });
-  }
-
 
 function generateRoomCode(): string {
     return Math.random().toString(36).slice(2, 7).toUpperCase();
