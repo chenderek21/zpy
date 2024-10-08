@@ -2,13 +2,32 @@ export interface LobbyPlayer {
     id: string;
     name: string;
     ready: boolean;
+    host: boolean;
 }
 
 export class Lobby {
     private players: LobbyPlayer[] = [];
     private gameStarted: boolean = false;
+    private numDecks: number = 0;
+    private numMaxPlayers: number = 0;
 
     constructor(private roomCode: string) {}
+
+    setNumDecks(numDecks: number) {
+        this.numDecks = numDecks;
+    }
+
+    getNumDecks() {
+        return this.numDecks;
+    }
+
+    setNumMaxPlayers(numMaxPlayers: number) {
+        this.numMaxPlayers = numMaxPlayers;
+    }
+
+    getNumMaxPlayers() {
+        return this.numMaxPlayers;
+    }
 
     addPlayer(player: LobbyPlayer) {
         this.players.push(player);
@@ -29,6 +48,13 @@ export class Lobby {
         }
     }
 
+    isHost(playerId: string) {
+        const player = this.players.find(player => player.id === playerId);
+        if (player) {
+            return player.host;
+        }
+    }
+
     areAllPlayersReady(): boolean {
         return this.players.every(player => player.ready);
     }
@@ -43,6 +69,8 @@ export class Lobby {
         return {
             players: this.players,
             gameStarted: this.gameStarted,
+            numMaxPlayers: this.numMaxPlayers,
+            numDecks: this.numDecks
         };
     }
 }

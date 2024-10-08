@@ -6,6 +6,20 @@ class Lobby {
         this.roomCode = roomCode;
         this.players = [];
         this.gameStarted = false;
+        this.numDecks = 0;
+        this.numMaxPlayers = 0;
+    }
+    setNumDecks(numDecks) {
+        this.numDecks = numDecks;
+    }
+    getNumDecks() {
+        return this.numDecks;
+    }
+    setNumMaxPlayers(numMaxPlayers) {
+        this.numMaxPlayers = numMaxPlayers;
+    }
+    getNumMaxPlayers() {
+        return this.numMaxPlayers;
     }
     addPlayer(player) {
         this.players.push(player);
@@ -22,6 +36,12 @@ class Lobby {
             player.ready = !player.ready;
         }
     }
+    isHost(playerId) {
+        const player = this.players.find(player => player.id === playerId);
+        if (player) {
+            return player.host;
+        }
+    }
     areAllPlayersReady() {
         return this.players.every(player => player.ready);
     }
@@ -34,6 +54,8 @@ class Lobby {
         return {
             players: this.players,
             gameStarted: this.gameStarted,
+            numMaxPlayers: this.numMaxPlayers,
+            numDecks: this.numDecks
         };
     }
 }

@@ -29,6 +29,32 @@
         <input type="text" id="playerName" placeholder="Enter your name" required>
         <button id="joinButton">Join Room Lobby</button>
     </div>
+
+    <!-- Host-only section for selecting game settings -->
+    <div id="hostControls" style="display: none;">
+        <h3>Game Settings</h3>
+        
+        <label for="numPlayers">Number of Players:</label>
+        <select id="numPlayers">
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+        </select>
+
+        <label for="numDecks">Number of Decks:</label>
+        <select id="numDecks">
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+        </select>
+
+        <button id="saveSettings">Save Settings</button>
+    </div>
+
     <div id='waitingForPlayers'>
         <br/><h2 id="gameStatus">Waiting for players to join...</h2>
         <button id="readyButton">Ready Up</button>

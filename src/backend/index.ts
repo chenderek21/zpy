@@ -148,7 +148,8 @@ io.on('connection', (socket) => {
     }
     const lobby = lobbies[roomCode];
     socket.emit('joinSuccess', ({code: roomCode, playerName: playerName}))
-    const lobbyPlayer = { id: socket.id, name: playerName, ready: false };
+    const isHost = lobbies[roomCode].getLobbyState().players.length == 0;
+    const lobbyPlayer = { id: socket.id, name: playerName, ready: false, host: isHost };
     lobby.addPlayer(lobbyPlayer);
 
     updateLobbyState(roomCode);
@@ -158,7 +159,17 @@ io.on('connection', (socket) => {
     const lobby = lobbies[roomCode];
     if (lobby) {
       lobby.toggleReady(socket.id);
-      //lobby.startGameIfReady();
+      //lobby.startGameIfReady(); this goes to a button that host clicks that says start game
+      updateLobbyState(roomCode);
+    }
+  });
+
+  socket.on('saveSettings', ({ roomCode, numPlayersSet, numDecksSet }) => {
+    const lobby = lobbies[roomCode];
+    if (lobby) {
+      lobby.setNumMaxPlayers(numPlayersSet);
+      lobby.setNumDecks(numDecksSet);
+      console.log('Saved settings of room '+roomCode+' as '+numPlayersSet+' players and '+numDecksSet+' decks.');
       updateLobbyState(roomCode);
     }
   });
@@ -176,7 +187,7 @@ io.on('connection', (socket) => {
     socket.join(roomCode)
     const lobby = lobbies[roomCode];
     if (lobby) {
-      console.log("emitting ")
+      console.log("emitting update of lobby state to room "+roomCode)
       io.to(roomCode).emit('update', { lobbyState: lobby.getLobbyState() });
     }
   }

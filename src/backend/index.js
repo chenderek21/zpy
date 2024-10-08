@@ -132,37 +132,41 @@ function delay(ms) {
 io.on('connection', (socket) => {
     console.log('a user connected');
     console.log(socket.id);
-    socket.on('showContent', ({ roomCode }) => {
+    socket.on('joinRoom', ({ roomCode }) => {
         updateLobbyState(roomCode);
     });
-    socket.on('joinRoom', ({ roomCode, playerName }) => {
-        // Get or create the lobby for the roomCode
+    socket.on('joinLobby', ({ roomCode, playerName }) => {
         if (!lobbies[roomCode]) {
             lobbies[roomCode] = new Lobby_1.Lobby(roomCode);
         }
         const lobby = lobbies[roomCode];
         socket.emit('joinSuccess', ({ code: roomCode, playerName: playerName }));
-        const lobbyPlayer = { id: socket.id, name: playerName, ready: false };
+        const isHost = lobbies[roomCode].getLobbyState().players.length == 0;
+        const lobbyPlayer = { id: socket.id, name: playerName, ready: false, host: isHost };
         lobby.addPlayer(lobbyPlayer);
-        // Emit the updated lobby state to all clients in the room
         updateLobbyState(roomCode);
     });
     socket.on('readyUp', ({ roomCode }) => {
         const lobby = lobbies[roomCode];
         if (lobby) {
             lobby.toggleReady(socket.id);
-            // Check if all players are ready and start the game if necessary
-            lobby.startGameIfReady();
-            // Emit the updated lobby state to all clients in the room
+            //lobby.startGameIfReady(); this goes to a button that host clicks that says start game
+            updateLobbyState(roomCode);
+        }
+    });
+    socket.on('saveSettings', ({ roomCode, numPlayersSet, numDecksSet }) => {
+        const lobby = lobbies[roomCode];
+        if (lobby) {
+            lobby.setNumMaxPlayers(numPlayersSet);
+            lobby.setNumDecks(numDecksSet);
+            console.log('Saved settings of room ' + roomCode + ' as ' + numPlayersSet + ' players and ' + numDecksSet + ' decks.');
             updateLobbyState(roomCode);
         }
     });
     socket.on('disconnect', () => {
-        // Remove the player from the lobby on disconnect
         for (const roomCode in lobbies) {
             const lobby = lobbies[roomCode];
             lobby.removePlayer(socket.id);
-            // Emit the updated lobby state to all clients in the room
             updateLobbyState(roomCode);
         }
     });
@@ -170,7 +174,7 @@ io.on('connection', (socket) => {
         socket.join(roomCode);
         const lobby = lobbies[roomCode];
         if (lobby) {
-            console.log("emitting ");
+            console.log("emitting update of lobby state to room " + roomCode);
             io.to(roomCode).emit('update', { lobbyState: lobby.getLobbyState() });
         }
     }

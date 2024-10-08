@@ -52,7 +52,9 @@ main {
     padding: 20px;
     text-align: center;
 }
-
+#hostControls {
+    padding: 5x;
+}
 #welcomeMessage {
     font-weight: bold; 
     font-size: 32px;
