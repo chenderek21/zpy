@@ -8,7 +8,6 @@ const socket = io('http://localhost:3000');
 //from the home page, create a new room -> redirects to the lobby page
 document.getElementById('createRoomBtn')?.addEventListener('click', () => {
     console.log("create room button clicked");
-    const roomCode = generateRoomCode();
     // Send a request to the server to create the room
     fetch('/create-room', {
         method: 'POST',
