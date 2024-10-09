@@ -77,6 +77,13 @@ export class Lobby {
         }
     }
 
+    assignHost(playerId: string) {
+        const player = this.players.find(player => player.id === playerId);
+        if (player) {
+            player.host = true;
+        }
+    }
+
     areAllPlayersReady(): boolean {
         return this.players.every(player => player.ready);
     }

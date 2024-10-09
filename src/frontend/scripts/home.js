@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
             numPlayersDisplay.style.display = 'block';
             numDecksDisplay.style.display = 'block';
             numPlayersDisplay.textContent = 'Number of Players: ' + lobbyState.getNumMaxPlayers();
-            numDecksDisplay.textContent = 'Number of Decks: ' + lobbyState.getNumMaxPlayers();
+            numDecksDisplay.textContent = 'Number of Decks: ' + lobbyState.getNumDecks();
         }
         //Logic to control whether to display start game button to host and waiting for host message
         const startGame = document.getElementById('startGame');
@@ -145,6 +145,9 @@ socket.on('joinSuccess', ({ code, playerName }) => {
 });
 socket.on('joinError', (message) => {
     alert(message);
+});
+socket.on('assignHost', (playerName) => {
+    alert(`The host has left! ${playerName} is now the host.`);
 });
 function getRoomCodeFromURL() {
     const urlParts = window.location.pathname.split('/');

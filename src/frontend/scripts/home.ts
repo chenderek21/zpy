@@ -172,6 +172,10 @@ socket.on('joinError', (message) => {
     alert(message);
 });
 
+socket.on('assignHost', (playerName) => {
+    alert(`The host has left! ${playerName} is now the host.`);
+});
+
 function getRoomCodeFromURL(): string {
     const urlParts = window.location.pathname.split('/');
     return urlParts[urlParts.length - 1];

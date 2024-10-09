@@ -171,7 +171,18 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     for (const roomCode in lobbies) {
       const lobby = lobbies[roomCode];
+      let assignNewHost = false;
+      if (lobby.isHost(socket.id)) {
+        assignNewHost = true;
+      }
       lobby.removePlayer(socket.id);
+      if (assignNewHost) {
+        if (lobby.getNumPlayers() > 0) {
+          const newHost = lobby.getPlayers()[0];
+          lobby.assignHost(newHost.id);
+          io.to(roomCode).emit('assignHost', newHost.name);
+        }
+      }
       updateLobbyState(roomCode);
     }
   });

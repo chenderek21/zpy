@@ -56,6 +56,12 @@ class Lobby {
             return player.host;
         }
     }
+    assignHost(playerId) {
+        const player = this.players.find(player => player.id === playerId);
+        if (player) {
+            player.host = true;
+        }
+    }
     areAllPlayersReady() {
         return this.players.every(player => player.ready);
     }
