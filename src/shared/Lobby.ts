@@ -6,12 +6,26 @@ export interface LobbyPlayer {
 }
 
 export class Lobby {
+
+    private code: string;
     private players: LobbyPlayer[] = [];
     private gameStarted: boolean = false;
     private numDecks: number = 0;
     private numMaxPlayers: number = 0;
 
-    constructor(private roomCode: string) {}
+    constructor(roomCode: string) {
+        this.code = roomCode;
+    }
+
+    static deserializeLobbyState(lobbyState: Lobby) {
+        const lobby = new Lobby(lobbyState.code);
+        Object.assign(lobby, lobbyState);
+        return lobby;
+    }
+
+    getRoomCode(): string {
+        return this.code;
+    }
 
     setNumDecks(numDecks: number) {
         this.numDecks = numDecks;
@@ -40,6 +54,14 @@ export class Lobby {
     getPlayer(playerId: string): LobbyPlayer | undefined {
         return this.players.find(player => player.id === playerId);
     }
+    
+    getPlayers() {
+        return this.players;
+    }
+
+    getNumPlayers() {
+        return this.players.length;
+    }
 
     toggleReady(playerId: string) {
         const player = this.getPlayer(playerId);
@@ -57,6 +79,10 @@ export class Lobby {
 
     areAllPlayersReady(): boolean {
         return this.players.every(player => player.ready);
+    }
+
+    isGameStarted(): boolean {
+        return this.gameStarted;
     }
 
     startGameIfReady() {

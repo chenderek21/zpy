@@ -3,11 +3,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Lobby = void 0;
 class Lobby {
     constructor(roomCode) {
-        this.roomCode = roomCode;
         this.players = [];
         this.gameStarted = false;
         this.numDecks = 0;
         this.numMaxPlayers = 0;
+        this.code = roomCode;
+    }
+    static deserializeLobbyState(lobbyState) {
+        const lobby = new Lobby(lobbyState.code);
+        Object.assign(lobby, lobbyState);
+        return lobby;
+    }
+    getRoomCode() {
+        return this.code;
     }
     setNumDecks(numDecks) {
         this.numDecks = numDecks;
@@ -30,6 +38,12 @@ class Lobby {
     getPlayer(playerId) {
         return this.players.find(player => player.id === playerId);
     }
+    getPlayers() {
+        return this.players;
+    }
+    getNumPlayers() {
+        return this.players.length;
+    }
     toggleReady(playerId) {
         const player = this.getPlayer(playerId);
         if (player) {
@@ -44,6 +58,9 @@ class Lobby {
     }
     areAllPlayersReady() {
         return this.players.every(player => player.ready);
+    }
+    isGameStarted() {
+        return this.gameStarted;
     }
     startGameIfReady() {
         if (this.areAllPlayersReady()) {

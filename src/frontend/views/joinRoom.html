@@ -55,6 +55,15 @@
         <button id="saveSettings">Save Settings</button>
     </div>
 
+    <!-- Non-host section for showing game settings -->
+    <div id="nonHostSettings" style="display: none;">
+        <h3>Game Settings</h3>
+        <div id="waitingForHostSettings">Waiting for host to confirm settings</div>
+        <div id="numPlayersDisplay" style="display: none;">Number of Players:</div>
+        <div id="numDecksDisplay" style="display: none;">Number of Decks:</div>
+    </div>
+
+
     <div id='waitingForPlayers'>
         <br/><h2 id="gameStatus">Waiting for players to join...</h2>
         <button id="readyButton">Ready Up</button>
@@ -62,8 +71,12 @@
 
     <h2>Players in Lobby:</h2>
     <div id="playerContainer"></div>
-    
-    <h2 id="gameStatus"></h2>
+
+    <button id="startGame" style="display: none;">Start Game</button> 
+    <div id="waitingForHostStart" style="display: none;">Waiting for host to start game...</div>
+
+
+
 
     <script src="/home.bundle.js"></script>
 
