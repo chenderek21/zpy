@@ -30,11 +30,18 @@
         <button id="joinButton">Join Room Lobby</button>
     </div>
 
+    <h3>Game Settings</h3>
+
+    <!-- Non-host section for showing game settings -->
+    <div id="nonHostSettings" style="display: none;">
+        <div id="waitingForHostSettings">Waiting for host to confirm settings</div>
+    </div>
+    <div id="numPlayersDisplay" style="display: none;">Number of Players:</div>
+    <div id="numDecksDisplay" style="display: none;">Number of Decks:</div>
+
     <!-- Host-only section for selecting game settings -->
-    <div id="hostControls" style="display: none;">
-        <h3>Game Settings</h3>
-        
-        <label for="numPlayers">Number of Players:</label>
+    <div id="hostControls" style="display: none;">        
+        <label for="numPlayers">Players:</label>
         <select id="numPlayers">
             <option value="2">2</option>
             <option value="3">3</option>
@@ -45,7 +52,7 @@
             <option value="8">8</option>
         </select>
 
-        <label for="numDecks">Number of Decks:</label>
+        <label for="numDecks">Decks:</label>
         <select id="numDecks">
             <option value="2">2</option>
             <option value="3">3</option>
@@ -55,26 +62,17 @@
         <button id="saveSettings">Save Settings</button>
     </div>
 
-    <!-- Non-host section for showing game settings -->
-    <div id="nonHostSettings" style="display: none;">
-        <h3>Game Settings</h3>
-        <div id="waitingForHostSettings">Waiting for host to confirm settings</div>
-        <div id="numPlayersDisplay" style="display: none;">Number of Players:</div>
-        <div id="numDecksDisplay" style="display: none;">Number of Decks:</div>
-    </div>
-
-
     <div id='waitingForPlayers'>
-        <br/><h2 id="gameStatus">Waiting for players to join...</h2>
+        <h2 id="gameStatus">Waiting for players to join...</h2>
         <button id="readyButton">Ready Up</button>
     </div>
 
     <h2>Players in Lobby:</h2>
     <div id="playerContainer"></div>
+</br>
 
-    <button id="startGame" style="display: none;">Start Game</button> 
+    <button id="startGame" style="display: none;">Start Game</button>
     <div id="waitingForHostStart" style="display: none;">Waiting for host to start game...</div>
-
 
 
 

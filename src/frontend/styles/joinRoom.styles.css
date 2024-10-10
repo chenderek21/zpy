@@ -85,6 +85,13 @@ button:hover {
     background-color: darkgreen;
 }
 
+/* center startgame button */
+button#startGame {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 input[type="text"] {
     padding: 10px;
     margin: 10px;

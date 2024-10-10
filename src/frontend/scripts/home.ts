@@ -58,7 +58,7 @@ document.getElementById('joinRoomBtn')?.addEventListener('click', () => {
     }
 });
 
-
+//room logic when player enters
 document.addEventListener("DOMContentLoaded", () => {
     const roomCode = getRoomCodeFromURL();
 
@@ -96,7 +96,9 @@ document.addEventListener("DOMContentLoaded", () => {
             numPlayersDisplay.textContent = 'Number of Players: '+lobbyState.getNumMaxPlayers();
             numDecksDisplay.textContent = 'Number of Decks: '+lobbyState.getNumDecks();
         }
-
+        //Logic to hide waiting for players to ready up
+        const gameStatus = document.getElementById('gameStatus') as HTMLElement;
+        gameStatus.textContent = (lobbyState.areAllPlayersReady() && lobbyState.getNumPlayers() > 1) ? 'All players are ready!' : 'Waiting for players to ready up...';
         //Logic to control whether to display start game button to host and waiting for host message
         const startGame = document.getElementById('startGame') as HTMLButtonElement;
         const waitingForHostStart = document.getElementById('waitingForHostStart') as HTMLElement;
@@ -113,6 +115,8 @@ document.addEventListener("DOMContentLoaded", () => {
             waitingForHostStart.style.display = 'none';
             startGame.style.display = 'none';
         }
+
+        
 
     });
 
@@ -158,8 +162,6 @@ document.addEventListener("DOMContentLoaded", () => {
             playerContainer.appendChild(playerDiv);
         });
 
-        const gameStatus = document.getElementById('gameStatus') as HTMLElement;
-        gameStatus.textContent = lobbyState.isGameStarted() ? 'Game has started!' : 'Waiting for players to ready up...';
     }
 });
 
