@@ -1,3 +1,5 @@
+import { Server, Socket } from 'socket.io';
+
 export interface LobbyPlayer {
     id: string;
     name: string;
@@ -8,18 +10,21 @@ export interface LobbyPlayer {
 export class Lobby {
 
     private code: string;
+    private server: Server;
     private players: LobbyPlayer[] = [];
     private gameStarted: boolean = false;
     private numDecks: number = 0;
     private numMaxPlayers: number = 0;
 
-    constructor(roomCode: string) {
+    constructor(roomCode: string, io: Server) {
         this.code = roomCode;
+        this.server = io; 
+        this.initializeNamespace(io); 
     }
 
-    static deserializeLobbyState(lobbyState: Lobby) {
-        const lobby = new Lobby(lobbyState.code);
-        Object.assign(lobby, lobbyState);
+    static deserializeLobbyState(lobbyState: Partial<Lobby>): Lobby {
+        const lobby = new Lobby(lobbyState.code);  // Just deserialize the state
+        Object.assign(lobby, lobbyState);  // Assign the serialized state to the new object
         return lobby;
     }
 
@@ -106,4 +111,60 @@ export class Lobby {
             numDecks: this.numDecks
         };
     }
+
+
+    // This method initializes the namespace and sets up socket listeners for this room
+    private initializeNamespace(io: Server) {
+        const namespace = io.of(`/lobby/${this.code}`);
+
+        namespace.on('connection', (socket: Socket) => {
+            console.log(`User connected to ${this.code}, socket ID: ${socket.id}`);
+
+            socket.on('joinRoom', ({ playerName }) => {
+                const isHost = this.players.length === 0; // First player is the host
+                const newPlayer: LobbyPlayer = { id: socket.id, name: playerName, ready: false, host: isHost };
+                this.addPlayer(newPlayer);
+                this.updateLobbyState();
+            });
+
+            socket.on('readyUp', () => {
+                this.toggleReady(socket.id);
+                this.updateLobbyState();
+            });
+
+            socket.on('saveSettings', ({ numPlayersSet, numDecksSet }) => {
+                this.setNumMaxPlayers(numPlayersSet);
+                this.setNumDecks(numDecksSet);
+                console.log(`Updated settings: ${numPlayersSet} players, ${numDecksSet} decks.`);
+                this.updateLobbyState();
+            });
+
+            socket.on('startGame', () => {
+                this.startGameIfReady();
+                this.updateLobbyState();
+            });
+
+            socket.on('disconnect', () => {
+                const wasHost = this.isHost(socket.id);
+                this.removePlayer(socket.id);
+                if (wasHost && this.getPlayers().length > 0) {
+                    const newHost = this.getPlayers()[0];
+                    this.assignHost(newHost.id);
+                    namespace.emit('assignHost', newHost.name);
+                }
+                this.updateLobbyState();
+            });
+
+            socket.on('cardClicked', (card) => {
+                console.log(`Card clicked: ${card.rank} of ${card.suit}`);
+            });
+        });
+    }
+
+    private updateLobbyState() {
+        const namespace = this.server.of(`/lobby/${this.code}`);
+        console.log(`Updating lobby state for ${this.code}`);
+        namespace.emit('update', this.getLobbyState());
+    }
+    
 }

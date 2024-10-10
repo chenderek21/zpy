@@ -4,7 +4,8 @@ module.exports = {
 
   entry: {
     'game': './src/frontend/scripts/game.ts',
-    'home': './src/frontend/scripts/home.ts'
+    'home': './src/frontend/scripts/home.ts',
+    'joinRoom': './src/frontend/scripts/joinRoom.ts'
   },
 
   devtool: 'inline-source-map',

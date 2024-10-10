@@ -69,11 +69,10 @@ function getLobby(roomCode) {
     return lobbies[roomCode];
 }
 app.get('/join/:roomCode', (req, res) => {
+    const session = req.session;
     const roomCode = req.params.roomCode;
     const lobby = getLobby(roomCode);
     if (lobby) {
-        // Define the absolute path to your game.html
-        console.log("displaying join room to " + roomCode);
         const gamePath = path_1.default.join(__dirname, '../frontend/views/joinRoom.html');
         // Send the game.html file to the client
         res.sendFile(gamePath);
@@ -188,5 +187,4 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
-//test commit
 //# sourceMappingURL=index.js.map
