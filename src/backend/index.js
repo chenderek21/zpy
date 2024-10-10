@@ -145,6 +145,14 @@ io.on('connection', (socket) => {
             updateLobbyState(roomCode);
         }
     });
+    socket.on('startGame', ({ roomCode }) => {
+        const lobby = lobbies[roomCode];
+        if (lobby) {
+            lobby.startGameIfReady();
+            console.log('started game for lobby ' + roomCode);
+            updateLobbyState(roomCode);
+        }
+    });
     socket.on('disconnect', () => {
         for (const roomCode in lobbies) {
             const lobby = lobbies[roomCode];

@@ -21,59 +21,62 @@
         </ul>
     </nav>
     <br/>
-    <h1 id="welcomeToRoom">Room </h1>
-    <p>Send this code to your friends so they can join the game!</p>
+    <div id="lobbyDisplay" style="display: block;">
+        <h1 id="welcomeToRoom">Room </h1>
+        <p>Send this code to your friends so they can join the game!</p>
 
-    <div id='enterName'>
-        <h2>Enter your name to join the lobby:</h2>
-        <input type="text" id="playerName" placeholder="Enter your name" required>
-        <button id="joinButton">Join Room Lobby</button>
+        <div id='enterName'>
+            <h2>Enter your name to join the lobby:</h2>
+            <input type="text" id="playerName" placeholder="Enter your name" required>
+            <button id="joinButton">Join Room Lobby</button>
+        </div>
+
+        <h3>Game Settings</h3>
+
+        <!-- Non-host section for showing game settings -->
+        <div id="nonHostSettings" style="display: none;">
+            <div id="waitingForHostSettings">Waiting for host to confirm settings</div>
+        </div>
+        <div id="numPlayersDisplay" style="display: none;">Number of Players:</div>
+        <div id="numDecksDisplay" style="display: none;">Number of Decks:</div>
+
+        <!-- Host-only section for selecting game settings -->
+        <div id="hostControls" style="display: none;">        
+            <label for="numPlayers">Players:</label>
+            <select id="numPlayers">
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+            </select>
+
+            <label for="numDecks">Decks:</label>
+            <select id="numDecks">
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+            </select>
+
+            <button id="saveSettings">Save Settings</button>
+        </div>
+
+        <div id='waitingForPlayers'>
+            <h2 id="gameStatus">Waiting for players to join...</h2>
+            <button id="readyButton">Ready Up</button>
+        </div>
+
+        <h2>Players in Lobby:</h2>
+        <div id="playerContainer"></div>
+        </br>
+
+        <button id="startGame" style="display: none;">Start Game</button>
+        <div id="waitingForHostStart" style="display: none;">Waiting for host to start game...</div>
     </div>
 
-    <h3>Game Settings</h3>
-
-    <!-- Non-host section for showing game settings -->
-    <div id="nonHostSettings" style="display: none;">
-        <div id="waitingForHostSettings">Waiting for host to confirm settings</div>
-    </div>
-    <div id="numPlayersDisplay" style="display: none;">Number of Players:</div>
-    <div id="numDecksDisplay" style="display: none;">Number of Decks:</div>
-
-    <!-- Host-only section for selecting game settings -->
-    <div id="hostControls" style="display: none;">        
-        <label for="numPlayers">Players:</label>
-        <select id="numPlayers">
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-        </select>
-
-        <label for="numDecks">Decks:</label>
-        <select id="numDecks">
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-        </select>
-
-        <button id="saveSettings">Save Settings</button>
-    </div>
-
-    <div id='waitingForPlayers'>
-        <h2 id="gameStatus">Waiting for players to join...</h2>
-        <button id="readyButton">Ready Up</button>
-    </div>
-
-    <h2>Players in Lobby:</h2>
-    <div id="playerContainer"></div>
-</br>
-
-    <button id="startGame" style="display: none;">Start Game</button>
-    <div id="waitingForHostStart" style="display: none;">Waiting for host to start game...</div>
-
+    <div id="gameDisplay" style="display: none;">Game screen</div>
 
 
     <script src="/home.bundle.js"></script>
