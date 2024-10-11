@@ -2,16 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const socket_io_client_1 = require("socket.io-client");
 const Lobby_1 = require("../../shared/Lobby");
-const socket = (0, socket_io_client_1.io)('http://localhost:3000');
 function getRoomCodeFromURL() {
     const urlParts = window.location.pathname.split('/');
-    return urlParts[urlParts.length - 1];
+    return urlParts[urlParts.length - 1].substring(0, 5);
 }
+const roomCode = getRoomCodeFromURL();
+const socket = (0, socket_io_client_1.io)(`/lobby/${roomCode}`);
 /* logic when player first enters room */
 document.addEventListener("DOMContentLoaded", () => {
-    const roomCode = getRoomCodeFromURL();
-    /* Adds player (socket) to room, but not lobby */
-    socket.emit('joinRoom', { roomCode });
     const welcomeToRoom = document.getElementById('welcomeToRoom');
     if (welcomeToRoom) {
         welcomeToRoom.textContent = `Welcome to Room ${roomCode}!`;
@@ -25,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
         joinButton.addEventListener('click', () => {
             const playerName = playerNameInput.value;
             if (playerName) {
-                socket.emit('joinLobby', { roomCode, playerName });
+                socket.emit('joinRoom', { playerName });
                 if (enterName) {
                     enterName.style.display = 'none';
                 }
@@ -114,18 +112,17 @@ if (saveSettingsButton) {
     saveSettingsButton.addEventListener('click', () => {
         const numPlayersSet = Number(numPlayersSetting.value);
         const numDecksSet = Number(numDecksSetting.value);
-        socket.emit('saveSettings', { roomCode, numPlayersSet, numDecksSet });
+        socket.emit('saveSettings', { numPlayersSet, numDecksSet });
         saveSettingsButton.textContent = 'Update Settings';
     });
 }
 //Ready up logic 
 const readyButton = document.getElementById('readyButton');
-const roomCode = getRoomCodeFromURL();
 if (readyButton) {
     let isReady = false;
     readyButton.addEventListener('click', () => {
         isReady = !isReady;
-        socket.emit('readyUp', { roomCode });
+        socket.emit('readyUp');
         readyButton.textContent = isReady ? "Undo Ready" : "Ready Up";
     });
 }
@@ -133,7 +130,7 @@ if (readyButton) {
 const startGameButton = document.getElementById('startGame');
 if (startGameButton) {
     startGameButton.addEventListener('click', () => {
-        socket.emit('startGame', { roomCode });
+        socket.emit('startGame');
         startGameButton.textContent = 'Game Starting...';
     });
 }

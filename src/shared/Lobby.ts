@@ -10,21 +10,24 @@ export interface LobbyPlayer {
 export class Lobby {
 
     private code: string;
-    private server: Server;
+    private io: Server | undefined;
     private players: LobbyPlayer[] = [];
     private gameStarted: boolean = false;
     private numDecks: number = 0;
     private numMaxPlayers: number = 0;
 
-    constructor(roomCode: string, io: Server) {
+    //server is optional parameter, used to initialize namespace 
+    constructor(roomCode: string, io ? : Server) {
         this.code = roomCode;
-        this.server = io; 
-        this.initializeNamespace(io); 
+        this.io = io; 
+        if (io) {
+            this.initializeNamespace(io);
+        }
     }
 
-    static deserializeLobbyState(lobbyState: Partial<Lobby>): Lobby {
-        const lobby = new Lobby(lobbyState.code);  // Just deserialize the state
-        Object.assign(lobby, lobbyState);  // Assign the serialized state to the new object
+    static deserializeLobbyState(lobbyState: Lobby): Lobby {
+        const lobby = new Lobby(lobbyState.code);  
+        Object.assign(lobby, lobbyState);  
         return lobby;
     }
 
@@ -113,15 +116,15 @@ export class Lobby {
     }
 
 
-    // This method initializes the namespace and sets up socket listeners for this room
-    private initializeNamespace(io: Server) {
+    // This method initializes the namespace and sets up socket listeners for this lobby
+    initializeNamespace(io: Server) {
         const namespace = io.of(`/lobby/${this.code}`);
-
+        console.log('initializeNamespace');
         namespace.on('connection', (socket: Socket) => {
             console.log(`User connected to ${this.code}, socket ID: ${socket.id}`);
 
             socket.on('joinRoom', ({ playerName }) => {
-                const isHost = this.players.length === 0; // First player is the host
+                const isHost = this.players.length === 0;
                 const newPlayer: LobbyPlayer = { id: socket.id, name: playerName, ready: false, host: isHost };
                 this.addPlayer(newPlayer);
                 this.updateLobbyState();
@@ -161,10 +164,12 @@ export class Lobby {
         });
     }
 
-    private updateLobbyState() {
-        const namespace = this.server.of(`/lobby/${this.code}`);
-        console.log(`Updating lobby state for ${this.code}`);
-        namespace.emit('update', this.getLobbyState());
+    updateLobbyState() {
+        if (this.io) {
+            const namespace = this.io.of(`/lobby/${this.code}`);
+            console.log(`Updating lobby state for ${this.code}`);
+            namespace.emit('update', this.getLobbyState());
+        }
     }
     
 }

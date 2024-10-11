@@ -9,7 +9,7 @@ import { globalCardStrengthMap, setTrumpCard } from './game/Game';
 import { Hand } from './game/Hand';
 import { Player } from './game/Player';
 import { Play } from './game/Play';
-
+import { Lobby} from '../shared/Lobby';
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
@@ -20,6 +20,8 @@ app.use(express.json());
 
 app.post('/create-room', (req, res) => {
   const roomCode = generateRoomCode(); 
+  const lobby = new Lobby(roomCode, io);
+  console.log('created lobby with roomCode '+roomCode);
   res.status(200).json({ message: 'Lobby created', code: roomCode });
 });
 

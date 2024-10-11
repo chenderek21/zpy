@@ -7,17 +7,43 @@ const express_1 = __importDefault(require("express"));
 const http_1 = __importDefault(require("http"));
 const socket_io_1 = require("socket.io");
 const path_1 = __importDefault(require("path"));
-const Card_1 = require("./game/Card");
-const Game_1 = require("./game/Game");
-const Play_1 = require("./game/Play");
 const Lobby_1 = require("../shared/Lobby");
 const app = (0, express_1.default)();
 const server = http_1.default.createServer(app);
 const io = new socket_io_1.Server(server);
-const lobbies = {};
 app.use(express_1.default.static('src/frontend'));
 app.use(express_1.default.static('dist'));
 app.use(express_1.default.json());
+app.post('/create-room', (req, res) => {
+    const roomCode = generateRoomCode();
+    const lobby = new Lobby_1.Lobby(roomCode, io);
+    console.log('created lobby with roomCode ' + roomCode);
+    res.status(200).json({ message: 'Lobby created', code: roomCode });
+});
+function generateRoomCode() {
+    return Math.random().toString(36).slice(2, 7).toUpperCase();
+}
+app.get('/join/:roomCode', (req, res) => {
+    const session = req.session;
+    const roomCode = req.params.roomCode;
+    const gamePath = path_1.default.join(__dirname, '../frontend/views/joinRoom.html');
+    res.sendFile(gamePath);
+});
+app.get('/game/:roomCode', (req, res) => {
+    const gamePath = path_1.default.join(__dirname, '../frontend/views/game.html');
+    res.sendFile(gamePath);
+});
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
+// app.get('/testValidatePlay', (req, res) => {
+//   setTrumpCard(new Card("hearts","3"));
+//   let cards = [new Card('spades', '2'), new Card('spades', '2'), new Card('spades', '2'),new Card('spades', '4'), new Card('spades', '4'), new Card('spades', '4')];
+//   let play = new Play(cards);
+//   console.log(play.parsePlay());
+//   res.send("Game simulation completed");
+// })
 // app.get('/getFirstTenCards', (req, res) => {
 //   setTrumpCard(new Card("hearts","3"));
 //   let twoDecks = new Deck(2);
@@ -54,137 +80,7 @@ app.use(express_1.default.json());
 //   }
 //   res.send("Game simulation completed");
 // });
-app.post('/create-room', (req, res) => {
-    const roomCode = req.body.roomCode;
-    createLobby(roomCode);
-    res.status(200).json({ message: 'Lobby created', code: roomCode });
-});
-function createLobby(roomCode) {
-    console.log('generated lobby with code: ' + roomCode);
-    const lobby = new Lobby_1.Lobby(roomCode);
-    lobbies[roomCode] = lobby;
-    return lobby;
-}
-function getLobby(roomCode) {
-    return lobbies[roomCode];
-}
-app.get('/join/:roomCode', (req, res) => {
-    const session = req.session;
-    const roomCode = req.params.roomCode;
-    const lobby = getLobby(roomCode);
-    if (lobby) {
-        const gamePath = path_1.default.join(__dirname, '../frontend/views/joinRoom.html');
-        // Send the game.html file to the client
-        res.sendFile(gamePath);
-    }
-    else {
-        res.status(404).json({
-            status: 404,
-            success: false,
-            error: "Room not found"
-        });
-    }
-});
-app.get('/game/:roomCode', (req, res) => {
-    const roomCode = req.params.roomCode;
-    const room = getLobby(roomCode);
-    if (room) {
-        console.log("joining via link to room " + roomCode);
-        const gamePath = path_1.default.join(__dirname, '../frontend/views/game.html');
-        res.sendFile(gamePath);
-    }
-    else {
-        res.status(404).json({
-            status: 404,
-            success: false,
-            error: "Room not found"
-        });
-    }
-});
-app.get('/testValidatePlay', (req, res) => {
-    (0, Game_1.setTrumpCard)(new Card_1.Card("hearts", "3"));
-    let cards = [new Card_1.Card('spades', '2'), new Card_1.Card('spades', '2'), new Card_1.Card('spades', '2'), new Card_1.Card('spades', '4'), new Card_1.Card('spades', '4'), new Card_1.Card('spades', '4')];
-    let play = new Play_1.Play(cards);
-    console.log(play.parsePlay());
-    res.send("Game simulation completed");
-});
-function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-io.on('connection', (socket) => {
-    console.log('a user connected');
-    console.log(socket.id);
-    socket.on('joinRoom', ({ roomCode }) => {
-        updateLobbyState(roomCode);
-    });
-    socket.on('joinLobby', ({ roomCode, playerName }) => {
-        if (!lobbies[roomCode]) {
-            lobbies[roomCode] = new Lobby_1.Lobby(roomCode);
-        }
-        const lobby = lobbies[roomCode];
-        socket.emit('joinSuccess', ({ code: roomCode, playerName: playerName }));
-        const isHost = lobbies[roomCode].getLobbyState().players.length == 0;
-        const lobbyPlayer = { id: socket.id, name: playerName, ready: false, host: isHost };
-        lobby.addPlayer(lobbyPlayer);
-        updateLobbyState(roomCode);
-    });
-    socket.on('readyUp', ({ roomCode }) => {
-        const lobby = lobbies[roomCode];
-        if (lobby) {
-            lobby.toggleReady(socket.id);
-            updateLobbyState(roomCode);
-        }
-    });
-    socket.on('saveSettings', ({ roomCode, numPlayersSet, numDecksSet }) => {
-        const lobby = lobbies[roomCode];
-        if (lobby) {
-            lobby.setNumMaxPlayers(numPlayersSet);
-            lobby.setNumDecks(numDecksSet);
-            console.log('Saved settings of room ' + roomCode + ' as ' + numPlayersSet + ' players and ' + numDecksSet + ' decks.');
-            updateLobbyState(roomCode);
-        }
-    });
-    socket.on('startGame', ({ roomCode }) => {
-        const lobby = lobbies[roomCode];
-        if (lobby) {
-            lobby.startGameIfReady();
-            console.log('started game for lobby ' + roomCode);
-            updateLobbyState(roomCode);
-        }
-    });
-    socket.on('disconnect', () => {
-        for (const roomCode in lobbies) {
-            const lobby = lobbies[roomCode];
-            let assignNewHost = false;
-            if (lobby.isHost(socket.id)) {
-                assignNewHost = true;
-            }
-            lobby.removePlayer(socket.id);
-            if (assignNewHost) {
-                if (lobby.getNumPlayers() > 0) {
-                    const newHost = lobby.getPlayers()[0];
-                    lobby.assignHost(newHost.id);
-                    io.to(roomCode).emit('assignHost', newHost.name);
-                }
-            }
-            updateLobbyState(roomCode);
-        }
-    });
-    function updateLobbyState(roomCode) {
-        socket.join(roomCode);
-        const lobby = lobbies[roomCode];
-        if (lobby) {
-            console.log("LobbyState Update to " + roomCode + ": " + JSON.stringify(lobby.getLobbyState()));
-            io.to(roomCode).emit('update', lobby);
-        }
-    }
-    // Handle the 'cardClicked' event
-    socket.on('cardClicked', (card) => {
-        console.log(`Card clicked: ${card.rank} of ${card.suit}`);
-    });
-});
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+// function delay(ms: number) {
+//   return new Promise(resolve => setTimeout(resolve, ms));
+// }
 //# sourceMappingURL=index.js.map

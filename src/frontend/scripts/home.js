@@ -6,12 +6,11 @@ const socket = (0, socket_io_client_1.io)('http://localhost:3000');
 /* from the home page, create a new room -> redirects to the lobby page */
 (_a = document.getElementById('createRoomBtn')) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
     console.log("create room button clicked");
-    const roomCode = generateRoomCode();
     /* sends request to the server to create the room */
     fetch('/create-room', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ roomCode: roomCode })
+        // body: JSON.stringify({ roomCode: roomCode })
     })
         .then(response => response.json())
         .then(data => {
@@ -55,9 +54,6 @@ const socket = (0, socket_io_client_1.io)('http://localhost:3000');
         displayErrorMessage('Please enter a room code');
     }
 });
-function generateRoomCode() {
-    return Math.random().toString(36).slice(2, 7).toUpperCase();
-}
 /* shows error message on homescreen */
 function displayErrorMessage(message) {
     const errorMessageDiv = document.getElementById('errorMessage');
