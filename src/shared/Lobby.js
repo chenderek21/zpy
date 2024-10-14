@@ -86,12 +86,15 @@ class Lobby {
             numDecks: this.numDecks
         };
     }
-    // This method initializes the namespace and sets up socket listeners for this lobby
     initializeNamespace(io) {
         const namespace = io.of(`/lobby/${this.code}`);
         console.log('initializeNamespace');
         namespace.on('connection', (socket) => {
-            console.log(`User connected to ${this.code}, socket ID: ${socket.id}`);
+            const session = socket.request.session;
+            const sessionId = session.id;
+            socket.join(sessionId);
+            console.log(`User connected to ${this.code}, socket ID: ${socket.id}, session ID: ${sessionId}`);
+            this.updateLobbyState();
             socket.on('joinRoom', ({ playerName }) => {
                 const isHost = this.players.length === 0;
                 const newPlayer = { id: socket.id, name: playerName, ready: false, host: isHost };

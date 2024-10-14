@@ -1,7 +1,3 @@
-import { io } from 'socket.io-client';
-
-const socket = io('http://localhost:3000');
-
 /* from the home page, create a new room -> redirects to the lobby page */
 document.getElementById('createRoomBtn')?.addEventListener('click', () => {
     console.log("create room button clicked");

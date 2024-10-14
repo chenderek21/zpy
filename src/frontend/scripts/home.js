@@ -1,8 +1,5 @@
 "use strict";
 var _a, _b;
-Object.defineProperty(exports, "__esModule", { value: true });
-const socket_io_client_1 = require("socket.io-client");
-const socket = (0, socket_io_client_1.io)('http://localhost:3000');
 /* from the home page, create a new room -> redirects to the lobby page */
 (_a = document.getElementById('createRoomBtn')) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
     console.log("create room button clicked");

@@ -1,4 +1,6 @@
+import { IncomingMessage } from 'http';
 import { Server, Socket } from 'socket.io';
+import { SessionData } from 'express-session';
 
 export interface LobbyPlayer {
     id: string;
@@ -6,6 +8,19 @@ export interface LobbyPlayer {
     ready: boolean;
     host: boolean;
 }
+
+declare module "express-session" {
+    interface SessionData {
+      id: string;
+    }
+  }
+
+declare module 'http' {
+  interface IncomingMessage {
+    session: SessionData;
+  }
+}
+
 
 export class Lobby {
 
@@ -115,14 +130,16 @@ export class Lobby {
         };
     }
 
-
-    // This method initializes the namespace and sets up socket listeners for this lobby
     initializeNamespace(io: Server) {
         const namespace = io.of(`/lobby/${this.code}`);
         console.log('initializeNamespace');
-        namespace.on('connection', (socket: Socket) => {
-            console.log(`User connected to ${this.code}, socket ID: ${socket.id}`);
 
+        namespace.on('connection', (socket) => {
+            const session = socket.request.session;
+            const sessionId = session.id;
+            socket.join(sessionId);
+            console.log(`User connected to ${this.code}, socket ID: ${socket.id}, session ID: ${sessionId}`);
+            this.updateLobbyState();
             socket.on('joinRoom', ({ playerName }) => {
                 const isHost = this.players.length === 0;
                 const newPlayer: LobbyPlayer = { id: socket.id, name: playerName, ready: false, host: isHost };

@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setTrumpCard = exports.Game = exports.trumpCardGlobal = exports.globalCardStrengthMap = exports.globalSortOrder = void 0;
+exports.Game = exports.trumpCardGlobal = exports.globalCardStrengthMap = exports.globalSortOrder = void 0;
+exports.setTrumpCard = setTrumpCard;
 exports.globalSortOrder = new Map();
 exports.globalCardStrengthMap = new Map();
 class Game {
@@ -37,7 +38,6 @@ function setTrumpCard(trumpCard) {
     //     console.log(`${key}: ${value}`);
     // });
 }
-exports.setTrumpCard = setTrumpCard;
 function getSortOrder(trumpCard) {
     let suitOrder = ['clubs', 'diamonds', 'spades', 'hearts'];
     let rankOrder = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
