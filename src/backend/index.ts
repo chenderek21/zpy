@@ -2,7 +2,7 @@ import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import path from 'path';
-import { Lobby } from '../shared/Lobby';
+import { Lobby } from './Lobby';
 import session from 'express-session'
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
