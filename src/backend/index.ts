@@ -2,7 +2,7 @@ import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import path from 'path';
-import { Lobby} from '../shared/Lobby';
+import { Lobby} from './Lobby';
 import session from 'express-session'
 
 const app = express();
@@ -15,13 +15,12 @@ app.use(express.json());
 
 const sessionMiddleware = session({
   secret: 'tmp-key', 
-  // resave: false,
+  resave: false,
   saveUninitialized: true
   // cookie: { secure: false } 
 });
 
 io.engine.use(sessionMiddleware);
-
 app.post('/create-room', (req, res) => {
   const roomCode = generateRoomCode(); 
   const lobby = new Lobby(roomCode, io);

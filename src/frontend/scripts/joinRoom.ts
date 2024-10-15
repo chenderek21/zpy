@@ -1,7 +1,7 @@
 import { io } from 'socket.io-client';
 
-import { LobbyPlayer } from '../../shared/Lobby';
-import { Lobby } from '../../shared/Lobby';
+import { LobbyPlayer } from '../../backend/Lobby';
+import { Lobby } from '../../backend/Lobby';
 
 
 function getRoomCodeFromURL(): string {
@@ -53,7 +53,8 @@ socket.on('joinError', (message) => {
 });
 
 socket.on('disconnect', () => {
-    alert(`Sorry, you have been disconnected.`);
+    alert(`Sorry, you have been disconnected. Redirecting to homepage...`);
+    console.log("sorry you've disconnected");
     window.location.href = `${window.location.origin}`;
 });
 

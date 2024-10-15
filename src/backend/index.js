@@ -7,7 +7,7 @@ const express_1 = __importDefault(require("express"));
 const http_1 = __importDefault(require("http"));
 const socket_io_1 = require("socket.io");
 const path_1 = __importDefault(require("path"));
-const Lobby_1 = require("../shared/Lobby");
+const Lobby_1 = require("./Lobby");
 const express_session_1 = __importDefault(require("express-session"));
 const app = (0, express_1.default)();
 const server = http_1.default.createServer(app);
@@ -17,7 +17,7 @@ app.use(express_1.default.static('dist'));
 app.use(express_1.default.json());
 const sessionMiddleware = (0, express_session_1.default)({
     secret: 'tmp-key',
-    // resave: false,
+    resave: false,
     saveUninitialized: true
     // cookie: { secure: false } 
 });

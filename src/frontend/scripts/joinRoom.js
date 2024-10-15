@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const socket_io_client_1 = require("socket.io-client");
-const Lobby_1 = require("../../shared/Lobby");
+const Lobby_1 = require("../../backend/Lobby");
 function getRoomCodeFromURL() {
     const urlParts = window.location.pathname.split('/');
     return urlParts[urlParts.length - 1].substring(0, 5);
@@ -42,7 +42,8 @@ socket.on('joinError', (message) => {
     alert(message);
 });
 socket.on('disconnect', () => {
-    alert(`Sorry, you have been disconnected.`);
+    alert(`Sorry, you have been disconnected. Redirecting to homepage...`);
+    console.log("sorry you've disconnected");
     window.location.href = `${window.location.origin}`;
 });
 //Lobby UI Logic

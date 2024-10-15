@@ -4,7 +4,6 @@
   "description": "Online implementation of the card game Zhao Peng You (Finding Friends)",
   "main": "index.js",
   "scripts": {
-    "build": "webpack --mode production",
     "dev": "nodemon src/backend/index.ts"
   },
   "keywords": [],
@@ -23,10 +22,12 @@
     "@types/node": "^20.9.0",
     "@types/socket.io": "^3.0.2",
     "@types/socket.io-client": "^3.0.0",
-    "nodemon": "^3.0.1",
+    "concurrently": "^9.0.1",
+    "nodemon": "^3.1.7",
     "ts-loader": "^9.5.1",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.6.3",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1"
