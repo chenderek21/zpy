@@ -15,9 +15,9 @@ app.use(express.json());
 
 const sessionMiddleware = session({
   secret: 'tmp-key', 
-  resave: false,
-  saveUninitialized: false,
-  cookie: { secure: false } 
+  // resave: false,
+  saveUninitialized: true
+  // cookie: { secure: false } 
 });
 
 io.engine.use(sessionMiddleware);

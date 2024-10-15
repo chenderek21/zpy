@@ -12,6 +12,7 @@ export interface LobbyPlayer {
 declare module "express-session" {
     interface SessionData {
       id: string;
+      name: string;
     }
   }
 
@@ -27,6 +28,7 @@ export class Lobby {
     private code: string;
     private io: Server | undefined;
     private players: LobbyPlayer[] = [];
+    private sessionToSocket = new Map<string, Socket>();
     private gameStarted: boolean = false;
     private numDecks: number = 0;
     private numMaxPlayers: number = 0;
@@ -137,18 +139,25 @@ export class Lobby {
         namespace.on('connection', (socket) => {
             const session = socket.request.session;
             const sessionId = session.id;
-            socket.join(sessionId);
+            //handles duplicate sessions, removes existing socket
+            const prevSocket = this.sessionToSocket.get(sessionId);
+            if (prevSocket) {
+                prevSocket.disconnect();
+                console.log("socket disconnected");
+            }
+            this.sessionToSocket.set(sessionId, socket);
             console.log(`User connected to ${this.code}, socket ID: ${socket.id}, session ID: ${sessionId}`);
             this.updateLobbyState();
             socket.on('joinRoom', ({ playerName }) => {
                 const isHost = this.players.length === 0;
-                const newPlayer: LobbyPlayer = { id: socket.id, name: playerName, ready: false, host: isHost };
+                const newPlayer: LobbyPlayer = { id: sessionId, name: playerName, ready: false, host: isHost };
                 this.addPlayer(newPlayer);
                 this.updateLobbyState();
+                socket.emit('joinSuccess', ({code: this.code, playerName: playerName}));
             });
 
             socket.on('readyUp', () => {
-                this.toggleReady(socket.id);
+                this.toggleReady(sessionId);
                 this.updateLobbyState();
             });
 
@@ -164,9 +173,13 @@ export class Lobby {
                 this.updateLobbyState();
             });
 
-            socket.on('disconnect', () => {
-                const wasHost = this.isHost(socket.id);
-                this.removePlayer(socket.id);
+            socket.on('disconnect', (reason) => {
+                if (reason==='server namespace disconnect') {
+                    console.log('server namespace disconnect');
+                    return
+                }
+                const wasHost = this.isHost(sessionId);
+                this.removePlayer(sessionId);
                 if (wasHost && this.getPlayers().length > 0) {
                     const newHost = this.getPlayers()[0];
                     this.assignHost(newHost.id);

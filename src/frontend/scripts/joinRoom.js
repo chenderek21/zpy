@@ -41,6 +41,10 @@ socket.on('joinSuccess', ({ code, playerName }) => {
 socket.on('joinError', (message) => {
     alert(message);
 });
+socket.on('disconnect', () => {
+    alert(`Sorry, you have been disconnected.`);
+    window.location.href = `${window.location.origin}`;
+});
 //Lobby UI Logic
 socket.on('update', (lobby) => {
     const lobbyState = Lobby_1.Lobby.deserializeLobbyState(lobby);

@@ -9,19 +9,18 @@ const socket_io_1 = require("socket.io");
 const path_1 = __importDefault(require("path"));
 const Lobby_1 = require("../shared/Lobby");
 const express_session_1 = __importDefault(require("express-session"));
-// import { sessionMiddleware } from './session/session.middleware'
-const sessionMiddleware = (0, express_session_1.default)({
-    secret: 'tmp-key',
-    resave: false,
-    saveUninitialized: false,
-    cookie: { secure: false }
-});
 const app = (0, express_1.default)();
 const server = http_1.default.createServer(app);
 const io = new socket_io_1.Server(server);
 app.use(express_1.default.static('src/frontend'));
 app.use(express_1.default.static('dist'));
 app.use(express_1.default.json());
+const sessionMiddleware = (0, express_session_1.default)({
+    secret: 'tmp-key',
+    // resave: false,
+    saveUninitialized: true
+    // cookie: { secure: false } 
+});
 io.engine.use(sessionMiddleware);
 app.post('/create-room', (req, res) => {
     const roomCode = generateRoomCode();
