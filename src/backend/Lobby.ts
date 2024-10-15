@@ -141,6 +141,7 @@ export class Lobby {
             const sessionId = session.id;
             //handles duplicate sessions, removes existing socket
             const prevSocket = this.sessionToSocket.get(sessionId);
+
             if (prevSocket) {
                 prevSocket.disconnect();
                 console.log("socket disconnected");
