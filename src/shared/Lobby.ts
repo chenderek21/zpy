@@ -11,15 +11,15 @@ export interface LobbyPlayer {
 
 declare module "express-session" {
     interface SessionData {
-      id: string;
-      name: string;
+        id: string;
+        name: string;
     }
-  }
+}
 
 declare module 'http' {
-  interface IncomingMessage {
-    session: SessionData;
-  }
+    interface IncomingMessage {
+        session: SessionData;
+    }
 }
 
 
@@ -34,17 +34,17 @@ export class Lobby {
     private numMaxPlayers: number = 0;
 
     //server is optional parameter, used to initialize namespace 
-    constructor(roomCode: string, io ? : Server) {
+    constructor(roomCode: string, io?: Server) {
         this.code = roomCode;
-        this.io = io; 
+        this.io = io;
         if (io) {
             this.initializeNamespace(io);
         }
     }
 
     static deserializeLobbyState(lobbyState: Lobby): Lobby {
-        const lobby = new Lobby(lobbyState.code);  
-        Object.assign(lobby, lobbyState);  
+        const lobby = new Lobby(lobbyState.code);
+        Object.assign(lobby, lobbyState);
         return lobby;
     }
 
@@ -79,7 +79,7 @@ export class Lobby {
     getPlayer(playerId: string): LobbyPlayer | undefined {
         return this.players.find(player => player.id === playerId);
     }
-    
+
     getPlayers() {
         return this.players;
     }
@@ -153,7 +153,7 @@ export class Lobby {
                 const newPlayer: LobbyPlayer = { id: sessionId, name: playerName, ready: false, host: isHost };
                 this.addPlayer(newPlayer);
                 this.updateLobbyState();
-                socket.emit('joinSuccess', ({code: this.code, playerName: playerName}));
+                socket.emit('joinSuccess', ({ code: this.code, playerName: playerName }));
             });
 
             socket.on('readyUp', () => {
@@ -174,7 +174,7 @@ export class Lobby {
             });
 
             socket.on('disconnect', (reason) => {
-                if (reason==='server namespace disconnect') {
+                if (reason === 'server namespace disconnect') {
                     console.log('server namespace disconnect');
                     return
                 }
@@ -201,5 +201,5 @@ export class Lobby {
             namespace.emit('update', this.getLobbyState());
         }
     }
-    
+
 }

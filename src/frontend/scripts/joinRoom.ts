@@ -6,7 +6,7 @@ import { Lobby } from '../../shared/Lobby';
 
 function getRoomCodeFromURL(): string {
     const urlParts = window.location.pathname.split('/');
-    return urlParts[urlParts.length - 1].substring(0,5);
+    return urlParts[urlParts.length - 1].substring(0, 5);
 }
 const roomCode = getRoomCodeFromURL();
 const socket = io(`/lobby/${roomCode}`);
@@ -53,13 +53,20 @@ socket.on('joinError', (message) => {
 });
 
 socket.on('disconnect', () => {
-    alert(`Sorry, you have been disconnected.`);
-    window.location.href = `${window.location.origin}`;
+    if (document.hasFocus()) {
+        window.alert(`Sorry, you have been disconnected.`);
+        window.location.href = `${window.location.origin}`;
+    } else {
+        window.addEventListener("focus", e => {
+            window.alert(`Sorry, you have been disconnected.`);
+            window.location.href = `${window.location.origin}`;
+        }, { once: true });
+    }
 });
 
 //Lobby UI Logic
 socket.on('update', (lobby) => {
-        
+
     const lobbyState = Lobby.deserializeLobbyState(lobby);
 
     //console.log(lobbyState);
@@ -84,25 +91,25 @@ socket.on('update', (lobby) => {
         waitingForHostSettings.style.display = 'none';
         numPlayersDisplay.style.display = 'block';
         numDecksDisplay.style.display = 'block';
-        numPlayersDisplay.textContent = 'Number of Players: '+lobbyState.getNumMaxPlayers();
-        numDecksDisplay.textContent = 'Number of Decks: '+lobbyState.getNumDecks();
+        numPlayersDisplay.textContent = 'Number of Players: ' + lobbyState.getNumMaxPlayers();
+        numDecksDisplay.textContent = 'Number of Decks: ' + lobbyState.getNumDecks();
     }
-    
+
     /* hide waiting for players to ready up */
     const gameStatus = document.getElementById('gameStatus') as HTMLElement;
     gameStatus.textContent = (lobbyState.areAllPlayersReady() && lobbyState.getNumPlayers() > 1) ? 'All players are ready!' : 'Waiting for players to ready up...';
-    
+
     /* control whether to display start game button to host and waiting for host message */
     const startGame = document.getElementById('startGame') as HTMLButtonElement;
     const waitingForHostStart = document.getElementById('waitingForHostStart') as HTMLElement;
-    
+
     /* If number of players matches expected players and all players are ready */
     if (lobbyState.getNumMaxPlayers() != 0 && lobbyState.getNumPlayers() == lobbyState.getNumMaxPlayers() && lobbyState.areAllPlayersReady()) {
         if (isHost) {
             startGame.style.display = 'block';
         }
         else {
-        waitingForHostStart.style.display = 'block';
+            waitingForHostStart.style.display = 'block';
         }
     }
     else { //in case host changes settings
@@ -121,7 +128,7 @@ socket.on('update', (lobby) => {
 
 function updateLobbyState(lobbyState: Lobby) {
     const playerContainer = document.getElementById('playerContainer') as HTMLElement;
-    playerContainer.innerHTML = ''; 
+    playerContainer.innerHTML = '';
 
     lobbyState.getPlayers().forEach((player: LobbyPlayer) => {
         const playerDiv = document.createElement('div');
@@ -143,7 +150,7 @@ if (saveSettingsButton) {
     saveSettingsButton.addEventListener('click', () => {
         const numPlayersSet = Number(numPlayersSetting.value);
         const numDecksSet = Number(numDecksSetting.value);
-        socket.emit('saveSettings', {numPlayersSet, numDecksSet})
+        socket.emit('saveSettings', { numPlayersSet, numDecksSet })
         saveSettingsButton.textContent = 'Update Settings';
     })
 }

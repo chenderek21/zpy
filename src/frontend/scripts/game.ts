@@ -11,8 +11,8 @@ socket.on('connect', () => {
 });
 
 interface Player {
-  id: string; 
-  name: string; 
+  id: string;
+  name: string;
 }
 
 interface Card {
@@ -54,8 +54,8 @@ fetch('/getFirstTenCards')
       img.src = '/assets/cards/' + card.img_url;
       img.alt = `${card.rank} of ${card.suit}`;
       img.width = 100; // optional, set width for the card
-      img.className = 'card'; 
-      
+      img.className = 'card';
+
       // Modify the click event listener
       img.addEventListener('click', () => {
         if (img.classList.contains('selected')) {
