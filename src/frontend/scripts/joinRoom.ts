@@ -1,7 +1,7 @@
 import { io } from 'socket.io-client';
 
-import { LobbyPlayer } from '../../shared/Lobby';
-import { Lobby } from '../../shared/Lobby';
+import { LobbyPlayer } from '../../backend/Lobby';
+import { Lobby } from '../../backend/Lobby';
 
 
 function getRoomCodeFromURL(): string {
